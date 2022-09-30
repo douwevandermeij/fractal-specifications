@@ -13,9 +13,9 @@
 [pypi-url]: https://pypi.org/project/fractal-specifications/
 [build-image]: https://github.com/douwevandermeij/fractal-specifications/actions/workflows/build.yml/badge.svg
 [build-url]: https://github.com/douwevandermeij/fractal-specifications/actions/workflows/build.yml
-[coverage-image]: https://codecov.io/gh/douwevandermeij/fractal-specifications/branch/main/graph/badge.svg
+[coverage-image]: https://codecov.io/gh/douwevandermeij/fractal-specifications/branch/main/graph/badge.svg?token=BOC1ZUJISV
 [coverage-url]: https://codecov.io/gh/douwevandermeij/fractal-specifications
-[quality-image]: https://api.codeclimate.com/v1/badges/55adbc041d119d371ef7/maintainability
+[quality-image]: https://api.codeclimate.com/v1/badges/455ddff201b43f9b1025/maintainability
 [quality-url]: https://codeclimate.com/github/douwevandermeij/fractal-specifications
 
 ## Installation
