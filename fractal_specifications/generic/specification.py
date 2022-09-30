@@ -10,19 +10,20 @@ def _parse_specification_item(field_op: str, value: Any) -> Optional[Specificati
 
         return EqualsSpecification(field_op, value)
     else:
+        specification: Optional[Specification] = None
         field, op = field_op.split("__")
         if op == "equals":
             from fractal_specifications.generic.operators import EqualsSpecification
 
-            return EqualsSpecification(field, value)
+            specification = EqualsSpecification(field, value)
         elif op == "in":
             from fractal_specifications.generic.operators import InSpecification
 
-            return InSpecification(field, value)
+            specification = InSpecification(field, value)
         elif op == "contains":
             from fractal_specifications.generic.operators import ContainsSpecification
 
-            return ContainsSpecification(field, value)
+            specification = ContainsSpecification(field, value)
         elif op == "lt":
             from fractal_specifications.generic.operators import LessThanSpecification
 
@@ -32,20 +33,21 @@ def _parse_specification_item(field_op: str, value: Any) -> Optional[Specificati
                 LessThanEqualSpecification,
             )
 
-            return LessThanEqualSpecification(field, value)
+            specification = LessThanEqualSpecification(field, value)
         elif op == "gt":
             from fractal_specifications.generic.operators import (
                 GreaterThanSpecification,
             )
 
-            return GreaterThanSpecification(field, value)
+            specification = GreaterThanSpecification(field, value)
         elif op == "gte":
             from fractal_specifications.generic.operators import (
                 GreaterThanEqualSpecification,
             )
 
-            return GreaterThanEqualSpecification(field, value)
-    return None
+            specification = GreaterThanEqualSpecification(field, value)
+
+        return specification
 
 
 def parse_specification(**kwargs) -> Iterator[Specification]:
