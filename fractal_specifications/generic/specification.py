@@ -5,12 +5,12 @@ from typing import Any, Collection, Iterator, Optional
 
 
 def _parse_specification_item(field_op: str, value: Any) -> Optional[Specification]:
+    specification: Optional[Specification] = None
     if "__" not in field_op:
         from fractal_specifications.generic.operators import EqualsSpecification
 
-        return EqualsSpecification(field_op, value)
+        specification = EqualsSpecification(field_op, value)
     else:
-        specification: Optional[Specification] = None
         field, op = field_op.split("__")
         if op == "equals":
             from fractal_specifications.generic.operators import EqualsSpecification
@@ -46,8 +46,7 @@ def _parse_specification_item(field_op: str, value: Any) -> Optional[Specificati
             )
 
             specification = GreaterThanEqualSpecification(field, value)
-
-        return specification
+    return specification
 
 
 def parse_specification(**kwargs) -> Iterator[Specification]:
