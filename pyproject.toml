@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "fractal-specifications"
-version = "0.0.4"
-description = "Fractal Specifications is an implementation of the specifications pattern for building SOLID logic for your Python applications."
+version = "1.0.0"
+description = "Fractal Specifications is an implementation of the specification pattern for building SOLID logic for your Python applications."
 authors = ["Douwe van der Meij <douwe@karibu-online.nl>"]
 
 [build-system]
