@@ -1,0 +1,56 @@
+repos:
+  - repo: local
+    hooks:
+      - id: package-version
+        name: Update package version
+        entry: bash -c 'if ! git diff --cached | grep "+version" && ! git diff | grep "+version"; then poetry version patch; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: local
+    hooks:
+      - id: autoflake
+        name: Remove unused imports
+        entry: autoflake --in-place --remove-all-unused-imports -r .
+        language: system
+        pass_filenames: false
+        always_run: true
+  - repo: local
+    hooks:
+      - id: black
+        name: Restructure code
+        entry: black .
+        language: system
+        pass_filenames: false
+        always_run: true
+  - repo: local
+    hooks:
+      - id: isort
+        name: Sort imports
+        entry: isort .
+        language: system
+        pass_filenames: false
+        always_run: true
+  - repo: local
+    hooks:
+      - id: pytest
+        name: Run all tests
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+  - repo: local
+    hooks:
+      - id: mypy
+        name: MyPy static type checker
+        entry: mypy --exclude 'setup\.py$' .
+        language: system
+        pass_filenames: false
+        always_run: true

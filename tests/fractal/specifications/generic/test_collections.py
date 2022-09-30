@@ -1,10 +1,6 @@
 from dataclasses import make_dataclass
 
-from fractal_specifications.generic.collections import (
-    AndSpecification,
-    CollectionSpecification,
-    OrSpecification,
-)
+from fractal_specifications.generic.collections import AndSpecification, OrSpecification
 from fractal_specifications.generic.operators import EqualsSpecification
 
 

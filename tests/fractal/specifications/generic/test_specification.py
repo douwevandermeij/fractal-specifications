@@ -1,7 +1,5 @@
 from dataclasses import make_dataclass
 
-import pytest
-
 from fractal_specifications.generic.collections import AndSpecification
 from fractal_specifications.generic.operators import (
     ContainsSpecification,

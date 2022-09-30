@@ -8,16 +8,10 @@ coverage:  ## Run tests with coverage
 
 deps:  ## Install dependencies
 	python -m pip install --upgrade pip
-	python -m pip install black coverage flake8 flit isort mccabe mypy pylint pytest pytest-cov pytest-asyncio pytest-lazy-fixture tox tox-gh-actions
+	python -m pip install black coverage flake8 flit isort mccabe mypy pylint pytest pytest-cov pytest-asyncio pytest-lazy-fixture tox tox-gh-actions pre-commit autoflake
 
 lint:  ## Lint and static-check
-	python -m black tests
-	python -m isort tests
-	python -m black fractal_specifications
-	python -m isort fractal_specifications
-	python -m flake8 fractal_specifications
-	#python -m pylint fractal_specifications
-	python -m mypy fractal_specifications
+	pre-commit run --all-files
 
 publish:  ## Publish to PyPi
 	python -m flit publish
