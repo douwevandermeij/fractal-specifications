@@ -25,7 +25,7 @@ classifiers = [
 ]
 description-file = "README.md"
 requires = []
-requires-python=">=3.7"
+requires-python=">=3.8"
 
 [tool.flit.metadata.requires-extra]
 test = [
@@ -44,7 +44,7 @@ line_length = 88
 
 [tool.black]
 line-length = 88
-target-version = ['py37']
+target-version = ['py38']
 include = '\.pyi?$'
 exclude = '''
 
