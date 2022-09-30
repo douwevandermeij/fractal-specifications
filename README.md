@@ -25,6 +25,26 @@ pip install fractal-specifications
 ```
 
 
+## Development
+
+Setup the development environment by running:
+
+```sh
+make deps
+```
+
+Happy coding.
+
+Occasionally you can run:
+
+```sh
+make lint
+```
+
+This is not explicitly necessary because the git hook does the same thing.
+
+**Do not disable the git hooks upon commit!**
+
 ## Usage
 
 Specifications can be used to encapsulate business rules.
@@ -36,7 +56,7 @@ In our example, the `obj` needs to provide the attribute `maximum_speed`.
 
 ### Full code example
 
-This example includes a repository to show an application of specificationss
+This example includes a repository to show an application of specifications.
 
 ```python
 from abc import ABC, abstractmethod

@@ -9,6 +9,7 @@ coverage:  ## Run tests with coverage
 deps:  ## Install dependencies
 	python -m pip install --upgrade pip
 	python -m pip install black coverage flake8 flit isort mccabe mypy pylint pytest pytest-cov pytest-asyncio pytest-lazy-fixture tox tox-gh-actions pre-commit autoflake
+	pre-commit install
 
 lint:  ## Lint and static-check
 	pre-commit run --all-files
