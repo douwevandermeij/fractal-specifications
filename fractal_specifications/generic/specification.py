@@ -1,52 +1,43 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import Any, Collection, Iterator, Optional
 
 
+class Operators(str, Enum):
+    EQUALS = "equals"
+    IN = "in"
+    CONTAINS = "contains"
+    LESS_THAN = "lt"
+    LESS_THAN_EQUAL = "lte"
+    GREATER_THAN = "gt"
+    GREATER_THAN_EQUAL = "gte"
+
+
+def get_op_specs():
+    from fractal_specifications.generic import operators
+
+    return {
+        Operators.EQUALS: operators.EqualsSpecification,
+        Operators.IN: operators.InSpecification,
+        Operators.CONTAINS: operators.ContainsSpecification,
+        Operators.LESS_THAN: operators.LessThanSpecification,
+        Operators.LESS_THAN_EQUAL: operators.LessThanEqualSpecification,
+        Operators.GREATER_THAN: operators.GreaterThanSpecification,
+        Operators.GREATER_THAN_EQUAL: operators.GreaterThanEqualSpecification,
+    }
+
+
 def _parse_specification_item(field_op: str, value: Any) -> Optional[Specification]:
-    specification: Optional[Specification] = None
     if "__" not in field_op:
-        from fractal_specifications.generic.operators import EqualsSpecification
+        return get_op_specs()[Operators.EQUALS](field_op, value)
 
-        specification = EqualsSpecification(field_op, value)
-    else:
-        field, op = field_op.split("__")
-        if op == "equals":
-            from fractal_specifications.generic.operators import EqualsSpecification
-
-            specification = EqualsSpecification(field, value)
-        elif op == "in":
-            from fractal_specifications.generic.operators import InSpecification
-
-            specification = InSpecification(field, value)
-        elif op == "contains":
-            from fractal_specifications.generic.operators import ContainsSpecification
-
-            specification = ContainsSpecification(field, value)
-        elif op == "lt":
-            from fractal_specifications.generic.operators import LessThanSpecification
-
-            return LessThanSpecification(field, value)
-        elif op == "lte":
-            from fractal_specifications.generic.operators import (
-                LessThanEqualSpecification,
-            )
-
-            specification = LessThanEqualSpecification(field, value)
-        elif op == "gt":
-            from fractal_specifications.generic.operators import (
-                GreaterThanSpecification,
-            )
-
-            specification = GreaterThanSpecification(field, value)
-        elif op == "gte":
-            from fractal_specifications.generic.operators import (
-                GreaterThanEqualSpecification,
-            )
-
-            specification = GreaterThanEqualSpecification(field, value)
-    return specification
+    field, operator = field_op.split("__")
+    for op, spec in get_op_specs().items():
+        if op == operator:
+            return spec(field, value)
+    return None
 
 
 def parse_specification(**kwargs) -> Iterator[Specification]:
