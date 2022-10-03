@@ -72,7 +72,7 @@ class Road:
     maximum_speed: int
 
     @staticmethod
-    def slow_roads_specification():
+    def slow_roads_specification() -> Specification:
         return EqualsSpecification("maximum_speed", 25)
 
 
@@ -131,7 +131,7 @@ class Road(models.Model):
     maximum_speed = models.IntegerField()
 
     @staticmethod
-    def slow_roads_specification():
+    def slow_roads_specification() -> Specification:
         return EqualsSpecification("maximum_speed", 25)
 
 
