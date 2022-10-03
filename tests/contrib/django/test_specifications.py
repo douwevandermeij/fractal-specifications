@@ -1,3 +1,5 @@
+from typing import Any, Collection
+
 import pytest
 from django.db.models import Q  # type: ignore
 
@@ -30,8 +32,8 @@ def test_create_q_dict():
         DjangoOrmSpecificationBuilder,
     )
 
-    assert isinstance(DjangoOrmSpecificationBuilder.create_q({"id": 1}), Q)
-    assert DjangoOrmSpecificationBuilder.create_q({"id": 1}).children == [("id", 1)]
+    assert isinstance(DjangoOrmSpecificationBuilder._create_q({"id": 1}), Q)
+    assert DjangoOrmSpecificationBuilder._create_q({"id": 1}).children == [("id", 1)]
 
 
 def test_create_q_list():
@@ -39,5 +41,26 @@ def test_create_q_list():
         DjangoOrmSpecificationBuilder,
     )
 
-    assert isinstance(DjangoOrmSpecificationBuilder.create_q([("id", 1)]), Q)
-    assert DjangoOrmSpecificationBuilder.create_q([("id", 1)]).children == [("id", 1)]
+    assert isinstance(DjangoOrmSpecificationBuilder._create_q([("id", 1)]), Q)
+    assert DjangoOrmSpecificationBuilder._create_q([("id", 1)]).children == [("id", 1)]
+
+
+def test_specification_not_mapped():
+    from fractal_specifications.contrib.django.specifications import (
+        DjangoOrmSpecificationBuilder,
+        SpecificationNotMappedToDjangoOrm,
+    )
+    from fractal_specifications.generic.specification import Specification
+
+    class ErrorSpecification(Specification):
+        def is_satisfied_by(self, obj: Any) -> bool:
+            return False
+
+        def to_collection(self) -> Collection:
+            return []
+
+        def __str__(self):
+            return self.__class__.__name__
+
+    with pytest.raises(SpecificationNotMappedToDjangoOrm):
+        DjangoOrmSpecificationBuilder.build(ErrorSpecification())
