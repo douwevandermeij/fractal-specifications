@@ -25,6 +25,12 @@ pip install fractal-specifications
 ```
 
 
+## Background
+
+This project comes with an [article on Medium](https://douwevandermeij.medium.com/specification-pattern-in-python-ff2bd0b603f6),
+which sets out what the specification pattern is, what the benefits are and how it can be used.
+
+
 ## Development
 
 Setup the development environment by running:
