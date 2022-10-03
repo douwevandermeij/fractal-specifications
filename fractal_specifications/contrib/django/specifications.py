@@ -13,7 +13,9 @@ class SpecificationNotMappedToDjangoOrm(Exception):
 
 class DjangoOrmSpecificationBuilder:
     @staticmethod
-    def build(specification: Specification = None) -> Optional[Union[Collection, Q]]:
+    def build(
+        specification: Specification = None,
+    ) -> Optional[Union[Collection, Dict, Q]]:
         if specification is None:
             return None
         if builder := DjangoOrmSpecificationBuilder._spec_builders().get(

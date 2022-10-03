@@ -96,14 +96,69 @@ class PythonListRoadRepository(RoadRepository):
         ]
 
 
-road_repository = PythonListRoadRepository([
-    Road(maximum_speed=25),
-    Road(maximum_speed=50),
-    Road(maximum_speed=80),
-    Road(maximum_speed=100),
-])
+if __name__ == '__main__':
+    road_repository = PythonListRoadRepository([
+        Road(maximum_speed=25),
+        Road(maximum_speed=50),
+        Road(maximum_speed=80),
+        Road(maximum_speed=100),
+    ])
+
+    print(road_repository.slow_roads())
+```
+
+## Contrib
+
+This library also comes with some additional helpers to integrate the specifications easier with existing backends,
+such as the Django ORM.
+
+### Django
+
+Specifications can easily be converted to (basic) Django ORM filters with `DjangoOrmSpecificationBuilder`.\
+Using this contrib package requires `django` to be installed.
+
+```python
+from abc import ABC, abstractmethod
+from django.db import models
+from typing import List
+
+from fractal_specifications.contrib.django.specifications import DjangoOrmSpecificationBuilder
+from fractal_specifications.generic.operators import EqualsSpecification
+from fractal_specifications.generic.specification import Specification
+
+
+class Road(models.Model):
+    maximum_speed = models.IntegerField()
+
+    @staticmethod
+    def slow_roads_specification():
+        return EqualsSpecification("maximum_speed", 25)
+
+
+class RoadRepository(ABC):
+    @abstractmethod
+    def get_all(self, specification: Specification) -> List[Road]:
+        ...
+
+    def slow_roads(self) -> List[Road]:
+        return self.get_all(Road.slow_roads_specification())
+
+
+class DjangoRoadRepository(RoadRepository):
+    def get_all(self, specification: Specification) -> List[Road]:
+        f = DjangoOrmSpecificationBuilder.build(specification)
+        return Road.objects.filter(**f)
 
 
 if __name__ == '__main__':
+    road_repository = DjangoRoadRepository()
+
     print(road_repository.slow_roads())
+```
+
+You could of course also skip the repository in between and do the filtering directly:
+
+```python
+f = DjangoOrmSpecificationBuilder.build(Road.slow_roads_specification())
+Road.objects.filter(**f)
 ```
