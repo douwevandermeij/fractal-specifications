@@ -7,6 +7,7 @@ from fractal_specifications.generic.operators import (
     GreaterThanEqualSpecification,
     GreaterThanSpecification,
     InSpecification,
+    IsNoneSpecification,
     LessThanEqualSpecification,
     LessThanSpecification,
     NotSpecification,
@@ -80,3 +81,9 @@ def test_contains_specification():
     spec = ContainsSpecification("name", "a")
     DC = make_dataclass("DC", [("name", str)])
     assert spec.is_satisfied_by(DC(**dict(name="fractal")))
+
+
+def test_is_none_specification():
+    spec = IsNoneSpecification("name")
+    DC = make_dataclass("DC", [("name", str)])
+    assert spec.is_satisfied_by(DC(**dict(name=None)))

@@ -30,49 +30,70 @@ def and_specification(equals_specification, other_equals_specification):
 
 
 @pytest.fixture
-def in_specification(equals_specification, other_equals_specification):
+def contains_specification():
+    from fractal_specifications.generic.operators import ContainsSpecification
+
+    return ContainsSpecification("field", "test")
+
+
+@pytest.fixture
+def in_specification():
     from fractal_specifications.generic.operators import InSpecification
 
     return InSpecification("field", [1, 2, 3])
 
 
 @pytest.fixture
-def less_than_specification(equals_specification, other_equals_specification):
+def in_empty_specification():
+    from fractal_specifications.generic.operators import InSpecification
+
+    return InSpecification("field", [])
+
+
+@pytest.fixture
+def less_than_specification():
     from fractal_specifications.generic.operators import LessThanSpecification
 
     return LessThanSpecification("id", 1)
 
 
 @pytest.fixture
-def less_than_equal_specification(equals_specification, other_equals_specification):
+def less_than_equal_specification():
     from fractal_specifications.generic.operators import LessThanEqualSpecification
 
     return LessThanEqualSpecification("id", 1)
 
 
 @pytest.fixture
-def greater_than_specification(equals_specification, other_equals_specification):
+def greater_than_specification():
     from fractal_specifications.generic.operators import GreaterThanSpecification
 
     return GreaterThanSpecification("id", 1)
 
 
 @pytest.fixture
-def greater_than_equal_specification(equals_specification, other_equals_specification):
+def greater_than_equal_specification():
     from fractal_specifications.generic.operators import GreaterThanEqualSpecification
 
     return GreaterThanEqualSpecification("id", 1)
 
 
 @pytest.fixture
-def regex_string_match_specification(equals_specification, other_equals_specification):
+def regex_string_match_specification():
     from fractal_specifications.generic.operators import RegexStringMatchSpecification
 
     return RegexStringMatchSpecification("id", "abc")
 
 
 @pytest.fixture
-def dict_specification(equals_specification, other_equals_specification):
+def is_none_specification():
+    from fractal_specifications.generic.operators import IsNoneSpecification
+
+    return IsNoneSpecification("field")
+
+
+@pytest.fixture
+def dict_specification():
     from fractal_specifications.generic.specification import Specification
 
     class DictSpecification(Specification):

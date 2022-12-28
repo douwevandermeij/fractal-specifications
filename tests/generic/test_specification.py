@@ -1,6 +1,6 @@
 from dataclasses import make_dataclass
 
-from fractal_specifications.generic.collections import AndSpecification
+from fractal_specifications.generic.collections import AndSpecification, OrSpecification
 from fractal_specifications.generic.operators import (
     ContainsSpecification,
     EqualsSpecification,
@@ -71,3 +71,17 @@ def test_specification_not_or():
 
 def test_parse_none():
     assert Specification.parse() is None
+
+
+def test_and():
+    assert Specification.parse(id=1) & Specification.parse(
+        name="a"
+    ) == AndSpecification(
+        [EqualsSpecification("id", 1), EqualsSpecification("name", "a")]
+    )
+
+
+def test_or():
+    assert Specification.parse(id=1) | Specification.parse(name="a") == OrSpecification(
+        [EqualsSpecification("id", 1), EqualsSpecification("name", "a")]
+    )

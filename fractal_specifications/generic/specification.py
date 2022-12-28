@@ -69,6 +69,12 @@ class Specification(ABC):
             return specification.Or(self)
         return OrSpecification([self, specification])
 
+    def __and__(self, other):
+        return self.And(other)
+
+    def __or__(self, other):
+        return self.Or(other)
+
     def __str__(self):
         raise NotImplementedError
 

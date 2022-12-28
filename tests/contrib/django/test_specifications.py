@@ -5,16 +5,17 @@ from django.db.models import Q  # type: ignore
 
 specifications = [
     (None, None),
-    (pytest.lazy_fixture("equals_specification"), {"id": 1}),  # type: ignore
+    (pytest.lazy_fixture("equals_specification"), Q(id=1)),  # type: ignore
     (pytest.lazy_fixture("or_specification"), Q(id=1) | Q(name="test")),  # type: ignore
     (pytest.lazy_fixture("and_specification"), Q(id=1, name="test")),  # type: ignore
-    (pytest.lazy_fixture("in_specification"), {"field__in": [1, 2, 3]}),  # type: ignore
-    (pytest.lazy_fixture("less_than_specification"), {"id__lt": 1}),  # type: ignore
-    (pytest.lazy_fixture("less_than_equal_specification"), {"id__lte": 1}),  # type: ignore
-    (pytest.lazy_fixture("greater_than_specification"), {"id__gt": 1}),  # type: ignore
-    (pytest.lazy_fixture("greater_than_equal_specification"), {"id__gte": 1}),  # type: ignore
-    (pytest.lazy_fixture("regex_string_match_specification"), {"id__regex": ".*abc.*"}),  # type: ignore
-    (pytest.lazy_fixture("dict_specification"), {"id": 1, "test": 2}),  # type: ignore
+    (pytest.lazy_fixture("in_specification"), Q(field__in=[1, 2, 3])),  # type: ignore
+    (pytest.lazy_fixture("less_than_specification"), Q(id__lt=1)),  # type: ignore
+    (pytest.lazy_fixture("less_than_equal_specification"), Q(id__lte=1)),  # type: ignore
+    (pytest.lazy_fixture("greater_than_specification"), Q(id__gt=1)),  # type: ignore
+    (pytest.lazy_fixture("greater_than_equal_specification"), Q(id__gte=1)),  # type: ignore
+    (pytest.lazy_fixture("regex_string_match_specification"), Q(id__regex=".*abc.*")),  # type: ignore
+    (pytest.lazy_fixture("is_none_specification"), Q(field__isnull=True)),  # type: ignore
+    (pytest.lazy_fixture("dict_specification"), Q(id=1, test=2)),  # type: ignore
 ]
 
 

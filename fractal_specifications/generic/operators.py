@@ -85,3 +85,11 @@ class ContainsSpecification(FieldValueSpecification):
 
 class RegexStringMatchSpecification(ContainsSpecification):
     pass
+
+
+class IsNoneSpecification(FieldValueSpecification):
+    def __init__(self, field: str):
+        super(IsNoneSpecification, self).__init__(field, None)
+
+    def is_satisfied_by(self, obj: Any) -> bool:
+        return getattr(obj, self.field) is None

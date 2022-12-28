@@ -123,6 +123,24 @@ such as the Django ORM.
 Specifications can easily be converted to (basic) Django ORM filters with `DjangoOrmSpecificationBuilder`.\
 Using this contrib package requires `django` to be installed.
 
+Query support:
+* [x] Direct model fields `field=value`
+* [ ] Indirect model fields `field__sub_field=value`
+  * Implies recursive subfields `field__sub_field__sub_sub_field=value`
+  * This holds for all operators below as well
+* [x] Equals `field=value` or `__exact`
+* [x] Less than `__lt`
+* [x] Less than equal `__lte`
+* [x] Greater than `__gt`
+* [x] Greater than equal `__gte`
+* [x] In `__in`
+* [x] And `Q((field_a=value_a) & (field_b=value_b))`
+* [x] Or `Q((field_a=value_a) | (field_b=value_b))`
+* [x] Partial regex `__regex=r".* value .*"`
+* [ ] Full regex `__regex`
+* [ ] Contains regex `__contains`
+* [x] Is null `__isnull`
+
 ```python
 from abc import ABC, abstractmethod
 from django.db import models
@@ -152,8 +170,9 @@ class RoadRepository(ABC):
 
 class DjangoRoadRepository(RoadRepository):
     def get_all(self, specification: Specification) -> List[Road]:
-        f = DjangoOrmSpecificationBuilder.build(specification)
-        return Road.objects.filter(**f)
+        if q := DjangoOrmSpecificationBuilder.build(specification):
+            return Road.objects.filter(q)
+        return Road.objects.all()
 
 
 if __name__ == '__main__':
@@ -165,6 +184,80 @@ if __name__ == '__main__':
 You could of course also skip the repository in between and do the filtering directly:
 
 ```python
-f = DjangoOrmSpecificationBuilder.build(Road.slow_roads_specification())
-Road.objects.filter(**f)
+from fractal_specifications.contrib.django.specifications import DjangoOrmSpecificationBuilder
+
+q = DjangoOrmSpecificationBuilder.build(Road.slow_roads_specification())
+Road.objects.filter(q)
+```
+
+### SQLAlchemy
+
+Query support:
+* [x] Direct model fields `{field: value}`
+* [x] And `{field: value, field2: value2}`
+* [x] Or `[{field: value}, {field2: value2}]`
+
+```python
+from fractal_specifications.contrib.sqlalchemy.specifications import SqlAlchemyOrmSpecificationBuilder
+
+q = SqlAlchemyOrmSpecificationBuilder.build(specification)
+```
+
+### Elasticsearch
+
+Using this contrib package requires `elasticsearch` to be installed.
+
+Query support:
+* [x] Exact term match (Equals) `{"match": {"%s.keyword" % field: value}}`
+* [x] String searches (In) `{"query_string": {"default_field": field, "query": value}}`
+* [x] And `{"bool": {"must": [...]}}`
+* [x] Or `{"bool": {"should": [...]}}`
+* [x] Less than `{"bool": {"filter": [{"range": {field: {"lt": value}}}]}}`
+* [x] Less than equal `{"bool": {"filter": [{"range": {field: {"lte": value}}}]}}`
+* [x] Greater than `{"bool": {"filter": [{"range": {field: {"gt": value}}}]}}`
+* [x] Greater than equal `{"bool": {"filter": [{"range": {field: {"gte": value}}}]}}`
+
+```python
+from elasticsearch import Elasticsearch
+from fractal_specifications.contrib.elasticsearch.specifications import ElasticSpecificationBuilder
+
+q = ElasticSpecificationBuilder.build(specification)
+Elasticsearch(...).search(body={"query": q})
+```
+
+### Google Firestore
+
+Query support:
+* [x] Equals `(field, "==", value)`
+* [x] And `[(field, "==", value), (field2, "==", value2)]`
+* [x] Contains `(field, "array-contains", value)`
+* [x] In `(field, "in", value)`
+* [x] Less than `(field, "<", value)`
+* [x] Less than equal `(field, "<=", value)`
+* [x] Greater than `(field, ">", value)`
+* [x] Greater than equal `(field, ">=", value)`
+
+```python
+from fractal_specifications.contrib.google_firestore.specifications import FirestoreSpecificationBuilder
+
+q = FirestoreSpecificationBuilder.build(specification)
+```
+
+### Mongo
+
+Query support:
+* [x] Equals `{field: {"$eq": value}}`
+* [x] And `{"$and": [{field: {"$eq": value}}, {field2: {"$eq": value2}}]}`
+* [x] Or `{"or": [{field: {"$eq": value}}, {field2: {"$eq": value2}}]}`
+* [x] In `{field: {"$in": value}}`
+* [x] Less than `{field: {"$lt": value}}`
+* [x] Less than equal `{field: {"$lte": value}}`
+* [x] Greater than `{field: {"$gt": value}}`
+* [x] Greater than equal `{field: {"$gte": value}}`
+* [x] Regex string match `{field: {"$regex": ".*%s.*" % value}}`
+
+```python
+from fractal_specifications.contrib.mongo.specifications import MongoSpecificationBuilder
+
+q = MongoSpecificationBuilder.build(specification)
 ```

@@ -1,6 +1,6 @@
 import re
 from functools import reduce
-from typing import Callable, Collection, Dict, Iterator, Optional, Type, Union
+from typing import Callable, Dict, Iterator, Optional, Type
 
 from django.db.models import Q  # type: ignore
 
@@ -12,32 +12,31 @@ class SpecificationNotMappedToDjangoOrm(Exception):
 
 
 class DjangoOrmSpecificationBuilder:
-    @staticmethod
+    @classmethod
     def build(
+        cls,
         specification: Specification = None,
-    ) -> Optional[Union[Collection, Dict, Q]]:
+    ) -> Optional[Q]:
         if specification is None:
             return None
-        if builder := DjangoOrmSpecificationBuilder._spec_builders().get(
-            type(specification)
-        ):
-            return builder(specification)
+        if builder := cls._spec_builders().get(type(specification)):
+            return cls._create_q(builder(specification))
         elif isinstance(specification.to_collection(), dict):
-            return specification.to_collection()
+            return cls._create_q(specification.to_collection())
         raise SpecificationNotMappedToDjangoOrm(
             f"Specification '{specification}' not mapped to Django Orm query."
         )
 
-    @staticmethod
-    def _spec_builders() -> Dict[Type[Specification], Callable]:
+    @classmethod
+    def _spec_builders(cls) -> Dict[Type[Specification], Callable]:
         from fractal_specifications.generic import collections, operators
 
         return {
             collections.AndSpecification: lambda s: reduce(
-                lambda x, y: x & y, DjangoOrmSpecificationBuilder._build_collection(s)
+                lambda x, y: x & y, cls._build_collection(s)
             ),
             collections.OrSpecification: lambda s: reduce(
-                lambda x, y: x | y, DjangoOrmSpecificationBuilder._build_collection(s)
+                lambda x, y: x | y, cls._build_collection(s)
             ),
             operators.EqualsSpecification: lambda s: {s.field: s.value},
             operators.InSpecification: lambda s: {f"{s.field}__in": s.value},
@@ -52,18 +51,18 @@ class DjangoOrmSpecificationBuilder:
             operators.RegexStringMatchSpecification: lambda s: {
                 f"{s.field}__regex": rf".*{re.escape(s.value)}.*"
             },
+            operators.IsNoneSpecification: lambda s: {f"{s.field}__isnull": True},
         }
 
-    @staticmethod
-    def _build_collection(specification) -> Iterator[Q]:
+    @classmethod
+    def _build_collection(cls, specification) -> Iterator[Q]:
         for spec in specification.to_collection():
-            yield DjangoOrmSpecificationBuilder._create_q(
-                DjangoOrmSpecificationBuilder.build(spec)
-            )
+            yield cls._create_q(cls.build(spec))
 
     @staticmethod
     def _create_q(filters) -> Q:
-        if type(filters) is list:
-            return Q(*filters)
-        elif type(filters) is dict:
+        if type(filters) == dict:
             return Q(**filters)
+        elif type(filters) in {list, set, tuple}:
+            return Q(*filters)
+        return filters
