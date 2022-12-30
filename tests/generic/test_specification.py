@@ -10,7 +10,10 @@ from fractal_specifications.generic.operators import (
     LessThanEqualSpecification,
     LessThanSpecification,
 )
-from fractal_specifications.generic.specification import Specification
+from fractal_specifications.generic.specification import (
+    EmptySpecification,
+    Specification,
+)
 
 
 def test_parse():
@@ -85,3 +88,10 @@ def test_or():
     assert Specification.parse(id=1) | Specification.parse(name="a") == OrSpecification(
         [EqualsSpecification("id", 1), EqualsSpecification("name", "a")]
     )
+
+
+def test_empty():
+    assert EmptySpecification().is_satisfied_by(None)
+    assert EmptySpecification().to_collection() == []
+    assert str(EmptySpecification()) == "EmptySpecification"
+    assert EmptySpecification() == EmptySpecification()

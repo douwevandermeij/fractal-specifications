@@ -94,3 +94,17 @@ class Specification(ABC):
         elif len(specs) == 1:
             return specs[0]
         return None
+
+
+class EmptySpecification(Specification):
+    def is_satisfied_by(self, obj: Any) -> bool:
+        return True
+
+    def to_collection(self) -> Collection:
+        return []
+
+    def __str__(self):
+        return self.__class__.__name__
+
+    def __eq__(self, other):
+        return isinstance(other, EmptySpecification)

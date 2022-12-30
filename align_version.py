@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 
 
 def get_version_pyproject():
@@ -14,9 +15,7 @@ def get_version_pyproject():
 
 if __name__ == "__main__":
     new_version_string = f'__version__ = "{get_version_pyproject()}"'
-    filename = os.path.join(
-        os.path.dirname(__file__), "fractal_specifications", "__init__.py"
-    )
+    filename = os.path.join(os.path.dirname(__file__), sys.argv[1], "__init__.py")
     with open(filename, "r+") as f:
         text = f.read()
         text = re.sub(

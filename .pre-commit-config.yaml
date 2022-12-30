@@ -11,7 +11,7 @@ repos:
     hooks:
       - id: align-version
         name: Align package version
-        entry: python align_version.py
+        entry: python align_version.py fractal_specifications
         language: system
         pass_filenames: false
         always_run: true
