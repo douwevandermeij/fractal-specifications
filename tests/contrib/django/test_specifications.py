@@ -16,6 +16,7 @@ specifications = [
     (pytest.lazy_fixture("regex_string_match_specification"), Q(id__regex=".*abc.*")),  # type: ignore
     (pytest.lazy_fixture("is_none_specification"), Q(field__isnull=True)),  # type: ignore
     (pytest.lazy_fixture("dict_specification"), Q(id=1, test=2)),  # type: ignore
+    (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
 ]
 
 

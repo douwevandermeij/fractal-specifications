@@ -37,6 +37,7 @@ Setup the development environment by running:
 
 ```sh
 make deps
+pre-commit install
 ```
 
 Happy coding.

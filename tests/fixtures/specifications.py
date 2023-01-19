@@ -107,3 +107,10 @@ def dict_specification():
             return self.collection
 
     return DictSpecification({"id": 1, "test": 2})
+
+
+@pytest.fixture
+def empty_specification():
+    from fractal_specifications.generic.specification import EmptySpecification
+
+    return EmptySpecification()

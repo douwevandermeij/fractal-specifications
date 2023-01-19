@@ -32,6 +32,7 @@ specifications = [
     (pytest.lazy_fixture("less_than_equal_specification"), {"bool": {"filter": [{"range": {"id": {"lte": 1}}}]}}),  # type: ignore
     (pytest.lazy_fixture("greater_than_specification"), {"bool": {"filter": [{"range": {"id": {"gt": 1}}}]}}),  # type: ignore
     (pytest.lazy_fixture("greater_than_equal_specification"), {"bool": {"filter": [{"range": {"id": {"gte": 1}}}]}}),  # type: ignore
+    (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
 ]
 
 

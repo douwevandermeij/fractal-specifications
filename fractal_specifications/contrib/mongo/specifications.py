@@ -11,7 +11,10 @@ from fractal_specifications.generic.operators import (
     LessThanSpecification,
     RegexStringMatchSpecification,
 )
-from fractal_specifications.generic.specification import Specification
+from fractal_specifications.generic.specification import (
+    EmptySpecification,
+    Specification,
+)
 
 
 class SpecificationNotMappedToMongo(Exception):
@@ -22,6 +25,8 @@ class MongoSpecificationBuilder:
     @staticmethod
     def build(specification: Specification = None) -> Optional[Collection]:
         if specification is None:
+            return None
+        elif isinstance(specification, EmptySpecification):
             return None
         elif isinstance(specification, AndSpecification):
             return {

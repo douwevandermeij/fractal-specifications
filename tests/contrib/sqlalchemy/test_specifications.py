@@ -6,6 +6,7 @@ specifications = [
     (pytest.lazy_fixture("or_specification"), [{"id": 1}, {"name": "test"}]),  # type: ignore
     (pytest.lazy_fixture("and_specification"), {"id": 1, "name": "test"}),  # type: ignore
     (pytest.lazy_fixture("dict_specification"), {"id": 1, "test": 2}),  # type: ignore
+    (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
 ]
 
 

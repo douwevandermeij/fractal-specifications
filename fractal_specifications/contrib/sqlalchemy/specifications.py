@@ -2,7 +2,10 @@ from typing import Collection, Optional
 
 from fractal_specifications.generic.collections import AndSpecification, OrSpecification
 from fractal_specifications.generic.operators import EqualsSpecification
-from fractal_specifications.generic.specification import Specification
+from fractal_specifications.generic.specification import (
+    EmptySpecification,
+    Specification,
+)
 
 
 class SpecificationNotMappedToSqlAlchemyOrm(Exception):
@@ -13,6 +16,8 @@ class SqlAlchemyOrmSpecificationBuilder:
     @staticmethod
     def build(specification: Specification = None) -> Optional[Collection]:
         if specification is None:
+            return None
+        elif isinstance(specification, EmptySpecification):
             return None
         elif isinstance(specification, OrSpecification):
             return [

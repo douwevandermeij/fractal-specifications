@@ -23,6 +23,7 @@ specifications = [
         pytest.lazy_fixture("dict_specification"),  # type: ignore
         {"$and": [{"id": {"$eq": 1}}, {"test": {"$eq": 2}}]},
     ),
+    (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
 ]
 
 

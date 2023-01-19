@@ -15,6 +15,7 @@ specifications = [
     (pytest.lazy_fixture("greater_than_specification"), ("id", ">", 1)),  # type: ignore
     (pytest.lazy_fixture("greater_than_equal_specification"), ("id", ">=", 1)),  # type: ignore
     (pytest.lazy_fixture("dict_specification"), [("id", "==", 1), ("test", "==", 2)]),  # type: ignore
+    (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
 ]
 
 

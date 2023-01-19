@@ -4,7 +4,10 @@ from typing import Callable, Dict, Iterator, Optional, Type
 
 from django.db.models import Q  # type: ignore
 
-from fractal_specifications.generic.specification import Specification
+from fractal_specifications.generic.specification import (
+    EmptySpecification,
+    Specification,
+)
 
 
 class SpecificationNotMappedToDjangoOrm(Exception):
@@ -18,6 +21,8 @@ class DjangoOrmSpecificationBuilder:
         specification: Specification = None,
     ) -> Optional[Q]:
         if specification is None:
+            return None
+        elif isinstance(specification, EmptySpecification):
             return None
         if builder := cls._spec_builders().get(type(specification)):
             return cls._create_q(builder(specification))
