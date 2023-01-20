@@ -30,8 +30,9 @@ class ElasticSpecificationBuilder:
             return {
                 "bool": {
                     "must": [
-                        ElasticSpecificationBuilder.build(spec)
+                        s
                         for spec in specification.to_collection()
+                        if (s := ElasticSpecificationBuilder.build(spec))
                     ]
                 }
             }
@@ -39,8 +40,9 @@ class ElasticSpecificationBuilder:
             return {
                 "bool": {
                     "should": [
-                        ElasticSpecificationBuilder.build(spec)
+                        s
                         for spec in specification.to_collection()
+                        if (s := ElasticSpecificationBuilder.build(spec))
                     ]
                 }
             }

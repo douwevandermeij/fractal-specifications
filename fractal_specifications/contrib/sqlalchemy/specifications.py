@@ -21,8 +21,9 @@ class SqlAlchemyOrmSpecificationBuilder:
             return None
         elif isinstance(specification, OrSpecification):
             return [
-                SqlAlchemyOrmSpecificationBuilder.build(spec)
+                s
                 for spec in specification.to_collection()
+                if (s := SqlAlchemyOrmSpecificationBuilder.build(spec))
             ]
         elif isinstance(specification, AndSpecification):
             return {

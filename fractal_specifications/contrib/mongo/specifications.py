@@ -31,15 +31,17 @@ class MongoSpecificationBuilder:
         elif isinstance(specification, AndSpecification):
             return {
                 "$and": [
-                    MongoSpecificationBuilder.build(spec)
+                    s
                     for spec in specification.to_collection()
+                    if (s := MongoSpecificationBuilder.build(spec))
                 ]
             }
         elif isinstance(specification, OrSpecification):
             return {
                 "$or": [
-                    MongoSpecificationBuilder.build(spec)
+                    s
                     for spec in specification.to_collection()
+                    if (s := MongoSpecificationBuilder.build(spec))
                 ]
             }
         elif isinstance(specification, InSpecification):

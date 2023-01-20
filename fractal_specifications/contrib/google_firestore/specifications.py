@@ -29,8 +29,9 @@ class FirestoreSpecificationBuilder:
             return None
         elif isinstance(specification, AndSpecification):
             return [
-                FirestoreSpecificationBuilder.build(spec)
+                s
                 for spec in specification.to_collection()
+                if (s := FirestoreSpecificationBuilder.build(spec))
             ]
         elif isinstance(specification, ContainsSpecification):
             return specification.field, "array-contains", specification.value

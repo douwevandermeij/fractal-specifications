@@ -62,7 +62,8 @@ class DjangoOrmSpecificationBuilder:
     @classmethod
     def _build_collection(cls, specification) -> Iterator[Q]:
         for spec in specification.to_collection():
-            yield cls._create_q(cls.build(spec))
+            if s := cls._create_q(cls.build(spec)):
+                yield s
 
     @staticmethod
     def _create_q(filters) -> Q:

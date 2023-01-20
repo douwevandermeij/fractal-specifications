@@ -16,17 +16,25 @@ def other_equals_specification():
 
 
 @pytest.fixture
-def or_specification(equals_specification, other_equals_specification):
+def or_specification(
+    empty_specification, equals_specification, other_equals_specification
+):
     from fractal_specifications.generic.collections import OrSpecification
 
-    return OrSpecification([equals_specification, other_equals_specification])
+    return OrSpecification(
+        [empty_specification, equals_specification, other_equals_specification]
+    )
 
 
 @pytest.fixture
-def and_specification(equals_specification, other_equals_specification):
+def and_specification(
+    empty_specification, equals_specification, other_equals_specification
+):
     from fractal_specifications.generic.collections import AndSpecification
 
-    return AndSpecification([equals_specification, other_equals_specification])
+    return AndSpecification(
+        [empty_specification, equals_specification, other_equals_specification]
+    )
 
 
 @pytest.fixture
