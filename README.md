@@ -299,32 +299,23 @@ print(df)
 # 3   4   dd  None
 
 
-specification = EqualsSpecification("id", 1)
-f = PandasSpecificationBuilder.build(specification)
-series = f(df)
+specification = EqualsSpecification("id", 4)
+f1 = PandasSpecificationBuilder.build(specification)
 
-print(series)
-# 0     True
-# 1    False
-# 2    False
-# 3    False
-
-print(df[series])
+print(f1(df))
 #    id name field
-# 0   1   aa     x
+# 3   4   dd  None
 
 
 specification = IsNoneSpecification("field")
-f = PandasSpecificationBuilder.build(specification)
-series = f(df)
+f2 = PandasSpecificationBuilder.build(specification)
 
-print(series)
-# 0    False
-# 1    False
-# 2    False
-# 3     True
+print(f2(df))
+#    id name field
+# 3   4   dd  None
 
-print(df[series])
+
+print(df.pipe(f1).pipe(f2))
 #    id name field
 # 3   4   dd  None
 ```

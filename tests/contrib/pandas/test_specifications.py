@@ -13,20 +13,20 @@ df = pd.DataFrame(
 
 specifications = [
     (None, None),
-    (pytest.lazy_fixture("equals_specification"), (df.id == 1).all()),  # type: ignore
+    (pytest.lazy_fixture("equals_specification"), df[df.id == 1].to_dict()),  # type: ignore
     (
         pytest.lazy_fixture("or_specification"),  # type: ignore
-        (df.id == 1).all() | (df.name == "test").all(),
+        (df[df.id == 1] | df[df.name == "test"]).to_dict(),
     ),
     (
         pytest.lazy_fixture("and_specification"),  # type: ignore
-        (df.id == 1).all() & (df.name == "test").all(),
+        (df[df.id == 1] & df[df.name == "test"]).to_dict(),
     ),
-    (pytest.lazy_fixture("in_specification"), (df.id.isin([1, 2, 3])).all()),  # type: ignore
-    (pytest.lazy_fixture("less_than_specification"), (df.id < 1).all()),  # type: ignore
-    (pytest.lazy_fixture("less_than_equal_specification"), (df.id <= 1).all()),  # type: ignore
-    (pytest.lazy_fixture("greater_than_specification"), (df.id > 1).all()),  # type: ignore
-    (pytest.lazy_fixture("greater_than_equal_specification"), (df.id >= 1).all()),  # type: ignore
+    (pytest.lazy_fixture("in_specification"), df[df.field.isin([1, 2, 3])].to_dict()),  # type: ignore
+    (pytest.lazy_fixture("less_than_specification"), df[df.id < 1].to_dict()),  # type: ignore
+    (pytest.lazy_fixture("less_than_equal_specification"), df[df.id <= 1].to_dict()),  # type: ignore
+    (pytest.lazy_fixture("greater_than_specification"), df[df.id > 1].to_dict()),  # type: ignore
+    (pytest.lazy_fixture("greater_than_equal_specification"), df[df.id >= 1].to_dict()),  # type: ignore
     (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
 ]
 
@@ -39,7 +39,7 @@ def test_build(specification, expected):
 
     f = PandasSpecificationBuilder.build(specification)
 
-    assert f == expected or f(df).all() == expected
+    assert f == expected or f(df).to_dict() == expected
 
 
 def test_specification_not_mapped():

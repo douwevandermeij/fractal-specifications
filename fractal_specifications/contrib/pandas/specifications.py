@@ -31,7 +31,7 @@ class PandasSpecificationBuilder:
     @classmethod
     def _spec_builders(
         cls,
-    ) -> Dict[Type[Specification], Callable,]:
+    ) -> Dict[Type[Specification], Callable]:
         from fractal_specifications.generic import collections, operators
 
         return {
@@ -41,16 +41,25 @@ class PandasSpecificationBuilder:
             collections.OrSpecification: lambda s: reduce(
                 lambda x, y: lambda df: x(df) | y(df), cls._build_collection(s)
             ),
-            operators.EqualsSpecification: lambda s: lambda df: df[s.field] == s.value,
-            operators.InSpecification: lambda s: lambda df: df[s.field].isin(s.value),
-            operators.LessThanSpecification: lambda s: lambda df: df[s.field] < s.value,
-            operators.LessThanEqualSpecification: lambda s: lambda df: df[s.field]
-            <= s.value,
-            operators.GreaterThanSpecification: lambda s: lambda df: df[s.field]
-            > s.value,
-            operators.GreaterThanEqualSpecification: lambda s: lambda df: df[s.field]
-            >= s.value,
-            operators.IsNoneSpecification: lambda s: lambda df: df[s.field].isna(),
+            operators.EqualsSpecification: lambda s: lambda df: df[
+                df[s.field] == s.value
+            ],
+            operators.InSpecification: lambda s: lambda df: df[
+                df[s.field].isin(s.value)
+            ],
+            operators.LessThanSpecification: lambda s: lambda df: df[
+                df[s.field] < s.value
+            ],
+            operators.LessThanEqualSpecification: lambda s: lambda df: df[
+                df[s.field] <= s.value
+            ],
+            operators.GreaterThanSpecification: lambda s: lambda df: df[
+                df[s.field] > s.value
+            ],
+            operators.GreaterThanEqualSpecification: lambda s: lambda df: df[
+                df[s.field] >= s.value
+            ],
+            operators.IsNoneSpecification: lambda s: lambda df: df[df[s.field].isna()],
         }
 
     @classmethod
