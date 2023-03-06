@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fractal-specifications"
-version = "2.1.2"
+version = "2.2.0"
 description = "Fractal Specifications is an implementation of the specification pattern for building SOLID logic for your Python applications."
 authors = ["Douwe van der Meij <douwe@karibu-online.nl>"]
 
@@ -15,7 +15,7 @@ author = "Douwe van der Meij"
 author-email = "douwe@karibu-online.nl"
 home-page = "https://github.com/douwevandermeij/fractal-specifications"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",

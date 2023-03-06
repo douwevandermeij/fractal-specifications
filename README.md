@@ -262,3 +262,69 @@ from fractal_specifications.contrib.mongo.specifications import MongoSpecificati
 
 q = MongoSpecificationBuilder.build(specification)
 ```
+
+### Pandas
+
+Query support:
+* [x] Equals `df[field] == value`
+* [x] And `df[field] == value & df[field2] == value2`
+* [x] Or `df[field] == value | df[field2] == value2`
+* [x] In `df[field].isin[value]`
+* [x] Less than `df[field] < value`
+* [x] Less than equal `df[field] <= value`
+* [x] Greater than `df[field] > value`
+* [x] Greater than equal `df[field] >= value`
+* [x] Is null `df[field].isna()`
+
+```python
+import pandas as pd
+
+from fractal_specifications.contrib.pandas.specifications import PandasSpecificationBuilder
+from fractal_specifications.generic.operators import EqualsSpecification, IsNoneSpecification
+
+
+df = pd.DataFrame(
+    {
+        "id": [1, 2, 3, 4],
+        "name": ["aa", "bb", "cc", "dd"],
+        "field": ["x", "y", "z", None],
+    }
+)
+
+print(df)
+#    id name field
+# 0   1   aa     x
+# 1   2   bb     y
+# 2   3   cc     z
+# 3   4   dd  None
+
+
+specification = EqualsSpecification("id", 1)
+f = PandasSpecificationBuilder.build(specification)
+series = f(df)
+
+print(series)
+# 0     True
+# 1    False
+# 2    False
+# 3    False
+
+print(df[series])
+#    id name field
+# 0   1   aa     x
+
+
+specification = IsNoneSpecification("field")
+f = PandasSpecificationBuilder.build(specification)
+series = f(df)
+
+print(series)
+# 0    False
+# 1    False
+# 2    False
+# 3     True
+
+print(df[series])
+#    id name field
+# 3   4   dd  None
+```
