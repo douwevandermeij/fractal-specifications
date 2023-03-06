@@ -103,7 +103,7 @@ class PythonListRoadRepository(RoadRepository):
         ]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     road_repository = PythonListRoadRepository([
         Road(maximum_speed=25),
         Road(maximum_speed=50),
@@ -176,7 +176,7 @@ class DjangoRoadRepository(RoadRepository):
         return Road.objects.all()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     road_repository = DjangoRoadRepository()
 
     print(road_repository.slow_roads())
@@ -276,6 +276,8 @@ Query support:
 * [x] Greater than equal `df[field] >= value`
 * [x] Is null `df[field].isna()`
 
+#### Filtering on columns:
+
 ```python
 import pandas as pd
 
@@ -318,4 +320,74 @@ print(f2(df))
 print(df.pipe(f1).pipe(f2))
 #    id name field
 # 3   4   dd  None
+
+
+specification = EqualsSpecification("id", 4) & IsNoneSpecification("field")
+f3 = PandasSpecificationBuilder.build(specification)
+
+print(f3(df))
+#    id name field
+# 3   4   dd  None
+```
+
+#### Filtering on indexes:
+
+```python
+import pandas as pd
+
+from fractal_specifications.contrib.pandas.specifications import PandasIndexSpecificationBuilder
+from fractal_specifications.generic.operators import EqualsSpecification, GreaterThanSpecification
+
+
+df = pd.DataFrame({"month": [1, 4, 7, 10],
+                   "year": [2012, 2014, 2013, 2014],
+                   "sale": [55, 40, 84, 31]})
+df = df.set_index("month")
+
+print(df)
+#        year  sale
+# month
+# 1      2012    55
+# 4      2014    40
+# 7      2013    84
+# 10     2014    31
+
+specification = EqualsSpecification("month", 4)
+f1 = PandasIndexSpecificationBuilder.build(specification)
+
+print(f1(df))
+#        year  sale
+# month
+# 4      2014    40
+
+
+df = df.reset_index()
+df = df.set_index("year")
+
+specification = GreaterThanSpecification("year", 2013)
+f2 = PandasIndexSpecificationBuilder.build(specification)
+
+print(f2(df))
+#       month  sale
+# year
+# 2014      4    40
+# 2014     10    31
+
+
+df = df.reset_index()
+df = df.set_index(["month", "year"])
+
+print(df.pipe(f1).pipe(f2))
+#             sale
+# month year
+# 4     2014    40
+
+
+specification = EqualsSpecification("month", 4) & GreaterThanSpecification("year", 2013)
+f3 = PandasIndexSpecificationBuilder.build(specification)
+
+print(f3(df))
+#             sale
+# month year
+# 4     2014    40
 ```
