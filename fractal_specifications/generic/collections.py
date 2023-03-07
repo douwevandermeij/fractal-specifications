@@ -21,6 +21,16 @@ class CollectionSpecification(Specification):
     def __eq__(self, other):
         return type(self) == type(other) and self.specifications == other.specifications
 
+    def to_dict(self):
+        return {
+            "op": self.name(),
+            "specs": [spec.to_dict() for spec in self.specifications],
+        }
+
+    @classmethod
+    def _from_dict(cls, d: dict):
+        return cls(specifications=[Specification.from_dict(s) for s in d["specs"]])
+
 
 class AndSpecification(CollectionSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:

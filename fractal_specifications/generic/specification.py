@@ -1,40 +1,42 @@
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
-from enum import Enum
-from typing import Any, Collection, Iterator, Optional
+from functools import lru_cache
+from typing import Any, Collection, Iterator, Optional, Type, TypeVar
 
 
-class Operators(str, Enum):
-    EQUALS = "equals"
-    IN = "in"
-    CONTAINS = "contains"
-    LESS_THAN = "lt"
-    LESS_THAN_EQUAL = "lte"
-    GREATER_THAN = "gt"
-    GREATER_THAN_EQUAL = "gte"
+@lru_cache
+def all_specifications():
+    def get_subclasses(spec):
+        for sub in spec.__subclasses__():
+            yield sub
+            for subsub in get_subclasses(sub):
+                yield subsub
 
-
-def get_op_specs():
-    from fractal_specifications.generic import operators
+    from fractal_specifications.generic import collections, operators
 
     return {
-        Operators.EQUALS: operators.EqualsSpecification,
-        Operators.IN: operators.InSpecification,
-        Operators.CONTAINS: operators.ContainsSpecification,
-        Operators.LESS_THAN: operators.LessThanSpecification,
-        Operators.LESS_THAN_EQUAL: operators.LessThanEqualSpecification,
-        Operators.GREATER_THAN: operators.GreaterThanSpecification,
-        Operators.GREATER_THAN_EQUAL: operators.GreaterThanEqualSpecification,
+        **{spec.name(): spec for spec in get_subclasses(Specification)},
+        **{
+            "==": operators.EqualsSpecification,
+            "<": operators.LessThanSpecification,
+            "<=": operators.LessThanEqualSpecification,
+            ">": operators.GreaterThanSpecification,
+            ">=": operators.GreaterThanEqualSpecification,
+            "!": operators.NotSpecification,
+            "&": collections.AndSpecification,
+            "|": collections.OrSpecification,
+        },
     }
 
 
 def _parse_specification_item(field_op: str, value: Any) -> Optional[Specification]:
     if "__" not in field_op:
-        return get_op_specs()[Operators.EQUALS](field_op, value)
+        return all_specifications()["equals"](field_op, value)
 
     field, operator = field_op.split("__")
-    for op, spec in get_op_specs().items():
+    for op, spec in all_specifications().items():
         if op == operator:
             return spec(field, value)
     return None
@@ -44,6 +46,9 @@ def parse_specification(**kwargs) -> Iterator[Specification]:
     for field_op, value in kwargs.items():
         if spec := _parse_specification_item(field_op, value):
             yield spec
+
+
+SpecificationSubType = TypeVar("SpecificationSubType", bound="Specification")
 
 
 class Specification(ABC):
@@ -94,6 +99,34 @@ class Specification(ABC):
         elif len(specs) == 1:
             return specs[0]
         return None
+
+    def to_dict(self):
+        return {
+            **{
+                "op": self.name(),
+            },
+            **self.__dict__,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        name = d.pop("op")
+        return all_specifications()[name]._from_dict(d)
+
+    @classmethod
+    def _from_dict(cls: Type[SpecificationSubType], d: dict):
+        return cls(**d)
+
+    def dumps(self):
+        return json.dumps(self.to_dict())
+
+    @staticmethod
+    def loads(s: str):
+        return Specification.from_dict(json.loads(s))
+
+    @classmethod
+    def name(cls):
+        return cls.__name__[:-13].lower()  # -Specification
 
 
 class EmptySpecification(Specification):

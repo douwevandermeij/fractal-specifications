@@ -87,3 +87,8 @@ def test_is_none_specification():
     spec = IsNoneSpecification("name")
     DC = make_dataclass("DC", [("name", str)])
     assert spec.is_satisfied_by(DC(**dict(name=None)))
+
+
+def test_is_none_specification_str():
+    spec = IsNoneSpecification("name")
+    assert spec.__str__() == "IsNoneSpecification(name)"

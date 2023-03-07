@@ -114,6 +114,16 @@ if __name__ == "__main__":
     print(road_repository.slow_roads())
 ```
 
+## Serialization / deserialization
+
+Specifications can be exported as dictionary and loaded as such via `spec.to_dict()` and `Specification.from_dict(d)` respectively.
+
+Specifications can also be exported to JSON via `spec.dumps()`. This essentially is a `json.dumps()` call around `spec.to_dict()`.
+
+JSON specification strings can be loaded directly as Specification object via `Specification.loads(s)`.
+
+Via this mechanism, specifications can be used outside the application runtime environment. For example, in a database or sent via API.
+
 ## Contrib
 
 This library also comes with some additional helpers to integrate the specifications easier with existing backends,
