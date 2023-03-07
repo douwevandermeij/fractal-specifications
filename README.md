@@ -265,18 +265,21 @@ q = MongoSpecificationBuilder.build(specification)
 
 ### Pandas
 
+Pandas support comes in two different flavours.
+You can use _columns_ or _indexes_ to filter on.
+
+#### Filtering on columns
+
 Query support:
 * [x] Equals `df[field] == value`
-* [x] And `df[field] == value & df[field2] == value2`
-* [x] Or `df[field] == value | df[field2] == value2`
+* [x] And `(df[field] == value) & (df[field2] == value2)`
+* [x] Or `(df[field] == value) | (df[field2] == value2)`
 * [x] In `df[field].isin[value]`
 * [x] Less than `df[field] < value`
 * [x] Less than equal `df[field] <= value`
 * [x] Greater than `df[field] > value`
 * [x] Greater than equal `df[field] >= value`
 * [x] Is null `df[field].isna()`
-
-#### Filtering on columns:
 
 ```python
 import pandas as pd
@@ -330,7 +333,18 @@ print(f3(df))
 # 3   4   dd  None
 ```
 
-#### Filtering on indexes:
+#### Filtering on indexes
+
+Query support:
+* [x] Equals `df.index.get_level_values(field) == value`
+* [x] And `(df.index.get_level_values(field) == value) & (df.index.get_level_values(field2) == value2)`
+* [x] Or `(df.index.get_level_values(field) == value) | (df.index.get_level_values(field2) == value2)`
+* [x] In `df.index.get_level_values(field).isin[value]`
+* [x] Less than `df.index.get_level_values(field) < value`
+* [x] Less than equal `df.index.get_level_values(field) <= value`
+* [x] Greater than `df.index.get_level_values(field) > value`
+* [x] Greater than equal `df.index.get_level_values(field) >= value`
+* [x] Is null `df.index.get_level_values(field).isna()`
 
 ```python
 import pandas as pd
