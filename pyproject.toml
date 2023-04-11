@@ -1,8 +1,11 @@
 [tool.poetry]
 name = "fractal-specifications"
-version = "2.3.0"
+version = "3.0.0"
 description = "Fractal Specifications is an implementation of the specification pattern for building SOLID logic for your Python applications."
 authors = ["Douwe van der Meij <douwe@karibu-online.nl>"]
+
+[tool.poetry.dependencies]
+lark = "*"
 
 [build-system]
 requires = ["flit_core >=2,<4"]
@@ -24,7 +27,9 @@ classifiers = [
     "Programming Language :: Python",
 ]
 description-file = "README.md"
-requires = []
+requires = [
+    "lark",
+]
 requires-python=">=3.8"
 
 [tool.flit.metadata.requires-extra]

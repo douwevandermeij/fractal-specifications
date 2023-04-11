@@ -124,6 +124,53 @@ JSON specification strings can be loaded directly as Specification object via `S
 
 Via this mechanism, specifications can be used outside the application runtime environment. For example, in a database or sent via API.
 
+### Domain Specific Language (DSL)
+
+Apart from basic JSON serialization, Fractal Specifications also comes with a DSL.
+
+Example specifications DSL strings:
+
+- `field_name == 10`
+  - This is a simple comparison expression with a numerical value.
+- `name != 'John'`
+  - This is another comparison expression with a string value.
+- `age >= 18 && is_student == True`
+  - This is a logical AND operation between two comparison expressions and a boolean value.
+- `roles contains "admin" || roles contains "editor"`
+  - This is a logical OR operation between two values of a list field.
+- `!(active == True)`
+  - This is a negation of an expression.
+- `name in ['John', 'Jane']`
+  - This is an in_expression that checks if a field value is present in a list of values.
+- `email matches \"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\"`
+  - This is a regex match_expression that checks if a field value matches a given pattern.
+- `items contains "element"`
+  - This is a contains_expression that checks if a list field contains a given value
+    - Contains can sometimes also be used with substrings, e.g, when using `is_satisfied_by`.
+- `salary is None`
+  - This is an is_none_expression that checks if a field value is None.
+- `#`
+  - This is an empty_expression that represents an empty expression.
+
+Specifications can be loaded from a DSL string with `spec = Specification.load_dsl(dsl_string)`.\
+Specifications can be serialized to a DSL string using `spec.dump_dsl()`.
+
+Example:
+```python
+from dataclasses import dataclass
+
+from fractal_specifications.generic.specification import Specification
+
+
+@dataclass
+class Demo:
+    field: str
+
+
+spec = Specification.load_dsl("field matches 'f.{20}s'")
+spec.is_satisfied_by(Demo("fractal_specifications"))  # True
+```
+
 ## Contrib
 
 This library also comes with some additional helpers to integrate the specifications easier with existing backends,

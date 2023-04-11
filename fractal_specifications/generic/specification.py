@@ -20,6 +20,7 @@ def all_specifications():
         **{spec.name(): spec for spec in get_subclasses(Specification)},
         **{
             "==": operators.EqualsSpecification,
+            "!=": operators.NotEqualsSpecification,
             "<": operators.LessThanSpecification,
             "<=": operators.LessThanEqualSpecification,
             ">": operators.GreaterThanSpecification,
@@ -33,7 +34,7 @@ def all_specifications():
 
 def _parse_specification_item(field_op: str, value: Any) -> Optional[Specification]:
     if "__" not in field_op:
-        return all_specifications()["equals"](field_op, value)
+        return all_specifications()["eq"](field_op, value)
 
     field, operator = field_op.split("__")
     for op, spec in all_specifications().items():
@@ -117,16 +118,67 @@ class Specification(ABC):
     def _from_dict(cls: Type[SpecificationSubType], d: dict):
         return cls(**d)
 
-    def dumps(self):
+    def dumps(self) -> str:
         return json.dumps(self.to_dict())
 
     @staticmethod
-    def loads(s: str):
+    def loads(s: str) -> Specification:
         return Specification.from_dict(json.loads(s))
 
     @classmethod
-    def name(cls):
+    def name(cls) -> str:
         return cls.__name__[:-13].lower()  # -Specification
+
+    def dump_dsl(self) -> Optional[str]:
+        from fractal_specifications.generic import collections, operators
+
+        if isinstance(self, operators.NotSpecification):
+            child = self.specification.dump_dsl()
+            return f"!({child})"
+        elif isinstance(self, operators.FieldValueSpecification):
+            lhs = self.field
+            operator = {
+                operators.EqualsSpecification.__name__: "==",
+                operators.NotEqualsSpecification.__name__: "!=",
+                operators.GreaterThanSpecification.__name__: ">",
+                operators.GreaterThanEqualSpecification.__name__: ">=",
+                operators.LessThanSpecification.__name__: "<",
+                operators.LessThanEqualSpecification.__name__: "<=",
+                operators.InSpecification.__name__: "in",
+                operators.ContainsSpecification.__name__: "contains",
+                operators.IsNoneSpecification.__name__: "is None",
+                operators.RegexStringMatchSpecification.__name__: "matches",
+            }[self.__class__.__name__]
+            if isinstance(self, operators.IsNoneSpecification):
+                return f"{lhs} {operator}"
+            rhs = f'"{self.value}"' if type(self.value) == str else repr(self.value)
+            return f"{lhs} {operator} {rhs}"
+        elif isinstance(
+            self, (collections.AndSpecification, collections.OrSpecification)
+        ):
+            op = {
+                collections.AndSpecification: " && ",
+                collections.OrSpecification: " || ",
+            }[type(self)]
+            child_strings = [
+                val for child in self.specifications if (val := child.dump_dsl())
+            ]
+            if child_strings:
+                return f"({op.join(child_strings)})"
+        elif isinstance(self, EmptySpecification):
+            return "#"
+        raise ValueError(f"Unsupported specification type: {type(self)}")
+
+    @staticmethod
+    def load_dsl(dsl_string) -> Specification:
+        from lark import Lark
+
+        from fractal_specifications.generic.dsl_parser import DSLTransformer, grammar
+
+        dsl_parser = Lark(grammar, start="start", parser="lalr")
+        transformer = DSLTransformer()
+        tree = dsl_parser.parse(dsl_string)
+        return transformer.transform(tree)
 
 
 class EmptySpecification(Specification):

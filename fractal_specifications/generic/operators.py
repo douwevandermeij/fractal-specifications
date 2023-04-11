@@ -71,6 +71,19 @@ class EqualsSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
         return getattr(obj, self.field) == self.value
 
+    @classmethod
+    def name(cls):
+        return "eq"
+
+
+class NotEqualsSpecification(FieldValueSpecification):
+    def is_satisfied_by(self, obj: Any) -> bool:
+        return getattr(obj, self.field) != self.value
+
+    @classmethod
+    def name(cls):
+        return "neq"
+
 
 class LessThanSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
@@ -114,11 +127,14 @@ class ContainsSpecification(FieldValueSpecification):
 
 
 class RegexStringMatchSpecification(ContainsSpecification):
-    pass
+    def is_satisfied_by(self, obj: Any) -> bool:
+        import re
+
+        return bool(re.match(self.value, getattr(obj, self.field)))
 
     @classmethod
     def name(cls):
-        return "regex"
+        return "matches"
 
 
 class IsNoneSpecification(FieldValueSpecification):

@@ -9,6 +9,7 @@ from fractal_specifications.generic.operators import (
     InSpecification,
     LessThanEqualSpecification,
     LessThanSpecification,
+    RegexStringMatchSpecification,
 )
 from fractal_specifications.generic.specification import (
     EmptySpecification,
@@ -20,9 +21,12 @@ def test_parse():
     assert Specification.parse(id=1) == EqualsSpecification("id", 1)
     assert Specification.parse(id_x=1) == EqualsSpecification("id_x", 1)
     assert not Specification.parse(id__x=1)
-    assert Specification.parse(id__equals=1) == EqualsSpecification("id", 1)
+    assert Specification.parse(id__eq=1) == EqualsSpecification("id", 1)
     assert Specification.parse(id__in=[1]) == InSpecification("id", [1])
     assert Specification.parse(id__contains="a") == ContainsSpecification("id", "a")
+    assert Specification.parse(name__matches=r"^.*$") == RegexStringMatchSpecification(
+        "name", r"^.*$"
+    )
     assert Specification.parse(id__lt=1) == LessThanSpecification("id", 1)
     assert Specification.parse(id__lte=1) == LessThanEqualSpecification("id", 1)
     assert Specification.parse(id__gt=1) == GreaterThanSpecification("id", 1)
@@ -30,13 +34,13 @@ def test_parse():
     assert Specification.parse(id=1, name="a") == AndSpecification(
         [EqualsSpecification("id", 1), EqualsSpecification("name", "a")]
     )
-    assert Specification.parse(id__equals=1, name__equals="a") == AndSpecification(
+    assert Specification.parse(id__eq=1, name__eq="a") == AndSpecification(
         [EqualsSpecification("id", 1), EqualsSpecification("name", "a")]
     )
-    assert Specification.parse(id__equals=1, name="a") == AndSpecification(
+    assert Specification.parse(id__eq=1, name="a") == AndSpecification(
         [EqualsSpecification("id", 1), EqualsSpecification("name", "a")]
     )
-    assert Specification.parse(id=1, name__equals="a") == AndSpecification(
+    assert Specification.parse(id=1, name__eq="a") == AndSpecification(
         [EqualsSpecification("id", 1), EqualsSpecification("name", "a")]
     )
     assert Specification.parse(id__gt=1, name__contains="a") == AndSpecification(

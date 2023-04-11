@@ -129,22 +129,20 @@ def complex_specification():
     from fractal_specifications.generic import operators
     from fractal_specifications.generic.specification import EmptySpecification
 
-    return operators.EqualsSpecification("id", 1) & operators.GreaterThanSpecification(
-        "price", 25
-    ) & operators.GreaterThanEqualSpecification(
-        "price", 25
-    ) & operators.LessThanSpecification(
-        "price", 25
-    ) & operators.LessThanEqualSpecification(
-        "price", 25
-    ) & operators.NotSpecification(
-        operators.IsNoneSpecification("name")
-    ) & operators.ContainsSpecification(
-        "field", "y"
-    ) & operators.InSpecification(
-        "field", [1, 2, 3]
-    ) & operators.RegexStringMatchSpecification(
-        "field", ".*abc.*"
-    ) | (
-        EmptySpecification() & EmptySpecification()
+    return (
+        operators.EqualsSpecification("id", 1)
+        & operators.EqualsSpecification("id", 1.5)
+        & operators.EqualsSpecification("id", False)
+        & operators.EqualsSpecification("id", True)
+        & operators.EqualsSpecification("id", None)
+        & operators.GreaterThanSpecification("price", 25)
+        & operators.GreaterThanEqualSpecification("price", 25)
+        & operators.LessThanSpecification("price", 25)
+        & operators.LessThanEqualSpecification("price", 25)
+        & operators.NotSpecification(operators.IsNoneSpecification("name"))
+        & operators.ContainsSpecification("field", "y")
+        | operators.NotEqualsSpecification("id", 1)
+        & operators.InSpecification("field", [1, 2, 3])
+        & operators.RegexStringMatchSpecification("field", ".*abc.*")
+        | (EmptySpecification() & EmptySpecification())
     )
