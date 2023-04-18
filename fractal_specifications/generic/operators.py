@@ -55,12 +55,18 @@ class FieldValueSpecification(Specification):
         return {self.field, self.value}
 
 
+def _get_value(obj: Any, field: str) -> Any:
+    for f in field.split("."):
+        obj = getattr(obj, f)
+    return obj
+
+
 class InSpecification(FieldValueSpecification):
     def __init__(self, field: str, values: List[Any]):
         super(InSpecification, self).__init__(field, values)
 
     def is_satisfied_by(self, obj: Any) -> bool:
-        return getattr(obj, self.field) in self.value
+        return _get_value(obj, self.field) in self.value
 
     @classmethod
     def _from_dict(cls, d: dict):
@@ -69,7 +75,7 @@ class InSpecification(FieldValueSpecification):
 
 class EqualsSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return getattr(obj, self.field) == self.value
+        return _get_value(obj, self.field) == self.value
 
     @classmethod
     def name(cls):
@@ -78,7 +84,7 @@ class EqualsSpecification(FieldValueSpecification):
 
 class NotEqualsSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return getattr(obj, self.field) != self.value
+        return _get_value(obj, self.field) != self.value
 
     @classmethod
     def name(cls):
@@ -87,7 +93,7 @@ class NotEqualsSpecification(FieldValueSpecification):
 
 class LessThanSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return getattr(obj, self.field) < self.value
+        return _get_value(obj, self.field) < self.value
 
     @classmethod
     def name(cls):
@@ -96,7 +102,7 @@ class LessThanSpecification(FieldValueSpecification):
 
 class LessThanEqualSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return getattr(obj, self.field) <= self.value
+        return _get_value(obj, self.field) <= self.value
 
     @classmethod
     def name(cls):
@@ -105,7 +111,7 @@ class LessThanEqualSpecification(FieldValueSpecification):
 
 class GreaterThanSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return getattr(obj, self.field) > self.value
+        return _get_value(obj, self.field) > self.value
 
     @classmethod
     def name(cls):
@@ -114,7 +120,7 @@ class GreaterThanSpecification(FieldValueSpecification):
 
 class GreaterThanEqualSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return getattr(obj, self.field) >= self.value
+        return _get_value(obj, self.field) >= self.value
 
     @classmethod
     def name(cls):
@@ -123,14 +129,14 @@ class GreaterThanEqualSpecification(FieldValueSpecification):
 
 class ContainsSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return self.value in getattr(obj, self.field)
+        return self.value in _get_value(obj, self.field)
 
 
 class RegexStringMatchSpecification(ContainsSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
         import re
 
-        return bool(re.match(self.value, getattr(obj, self.field)))
+        return bool(re.match(self.value, _get_value(obj, self.field)))
 
     @classmethod
     def name(cls):
@@ -145,7 +151,7 @@ class IsNoneSpecification(FieldValueSpecification):
         return f"{self.__class__.__name__}({self.field})"
 
     def is_satisfied_by(self, obj: Any) -> bool:
-        return getattr(obj, self.field) is None
+        return _get_value(obj, self.field) is None
 
     @classmethod
     def _from_dict(cls, d: dict):

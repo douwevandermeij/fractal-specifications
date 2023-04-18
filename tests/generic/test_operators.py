@@ -55,6 +55,13 @@ def test_equals_specification():
     assert spec.is_satisfied_by(DC(**dict(id=1)))
 
 
+def test_equals_specification_dot():
+    spec = EqualsSpecification("obj.id", 1)
+    DC1 = make_dataclass("DC1", [("id", int)])
+    DC2 = make_dataclass("DC2", [("obj", DC1)])
+    assert spec.is_satisfied_by(DC2(DC1(**dict(id=1))))
+
+
 def test_not_equals_specification():
     spec = NotEqualsSpecification("id", 1)
     DC = make_dataclass("DC", [("id", int)])
