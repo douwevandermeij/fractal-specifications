@@ -170,6 +170,7 @@ class Specification(ABC):
         raise ValueError(f"Unsupported specification type: {type(self)}")
 
     @staticmethod
+    @lru_cache
     def load_dsl(dsl_string) -> Specification:
         from lark import Lark
 
