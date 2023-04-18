@@ -163,6 +163,7 @@ def test_random_dsl_strings():
         'address contains "123 Main St"',
         "#",
         "salary is None",
+        "obj.id == 1",
     ]:
         spec = Specification.load_dsl(s)
         assert spec == Specification.load_dsl(spec.dump_dsl())

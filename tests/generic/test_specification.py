@@ -22,6 +22,7 @@ def test_parse():
     assert Specification.parse(id_x=1) == EqualsSpecification("id_x", 1)
     assert not Specification.parse(id__x=1)
     assert Specification.parse(id__eq=1) == EqualsSpecification("id", 1)
+    assert Specification.parse(obj__id__eq=1) == EqualsSpecification("obj.id", 1)
     assert Specification.parse(id__in=[1]) == InSpecification("id", [1])
     assert Specification.parse(id__contains="a") == ContainsSpecification("id", "a")
     assert Specification.parse(name__matches=r"^.*$") == RegexStringMatchSpecification(

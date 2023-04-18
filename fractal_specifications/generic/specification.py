@@ -34,12 +34,13 @@ def all_specifications():
 
 def _parse_specification_item(field_op: str, value: Any) -> Optional[Specification]:
     if "__" not in field_op:
-        return all_specifications()["eq"](field_op, value)
+        return all_specifications()["=="](field_op, value)
 
-    field, operator = field_op.split("__")
-    for op, spec in all_specifications().items():
-        if op == operator:
-            return spec(field, value)
+    parts = field_op.split("__")
+    field = ".".join(parts[:-1])
+    op = parts[-1]
+    if spec := all_specifications().get(op, None):
+        return spec(field, value)
     return None
 
 
@@ -83,6 +84,9 @@ class Specification(ABC):
 
     def __str__(self):
         raise NotImplementedError
+
+    def __repr__(self):
+        return self.__str__()
 
     @staticmethod
     def Not(specification: "Specification") -> "Specification":

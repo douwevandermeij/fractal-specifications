@@ -40,7 +40,7 @@ grammar = r"""
         | "<=" -> lte_op
         | ">" -> gt_op
         | ">="-> gte_op
-    field_name: CNAME
+    field_name: CNAME ("." CNAME)*
     string_value: ESCAPED_STRING | DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING
     number_value: SIGNED_FLOAT | SIGNED_INT
     boolean_value: "True" -> true | "False" -> false
@@ -125,7 +125,7 @@ class DSLTransformer(Transformer):
         return ContainsSpecification(field_name, value)
 
     def field_name(self, items):
-        return str(items[0])
+        return ".".join(items)
 
     def is_none_expression(self, items):
         return IsNoneSpecification(items[0])

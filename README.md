@@ -132,6 +132,8 @@ Example specifications DSL strings:
 
 - `field_name == 10`
   - This is a simple comparison expression with a numerical value.
+- `obj.id == 10`
+  - This is a comparison expression on an object attribute with a numerical value.
 - `name != 'John'`
   - This is another comparison expression with a string value.
 - `age >= 18 && is_student == True`

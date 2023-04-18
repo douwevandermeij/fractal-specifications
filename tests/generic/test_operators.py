@@ -119,3 +119,8 @@ def test_is_none_specification():
 def test_is_none_specification_str():
     spec = IsNoneSpecification("name")
     assert spec.__str__() == "IsNoneSpecification(name)"
+
+
+def test_is_none_specification_repr():
+    spec = IsNoneSpecification("name")
+    assert spec.__repr__() == "IsNoneSpecification(name)"
