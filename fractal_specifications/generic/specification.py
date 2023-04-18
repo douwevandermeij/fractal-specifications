@@ -33,15 +33,12 @@ def all_specifications():
 
 
 def _parse_specification_item(field_op: str, value: Any) -> Optional[Specification]:
-    if "__" not in field_op:
-        return all_specifications()["=="](field_op, value)
-
     parts = field_op.split("__")
     field = ".".join(parts[:-1])
     op = parts[-1]
     if spec := all_specifications().get(op, None):
         return spec(field, value)
-    return None
+    return all_specifications()["=="](".".join(parts), value)
 
 
 def parse_specification(**kwargs) -> Iterator[Specification]:
