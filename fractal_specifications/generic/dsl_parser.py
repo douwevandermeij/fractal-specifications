@@ -137,9 +137,9 @@ class DSLTransformer(Transformer):
         token = tokens[0]
         if token is None:
             return None
-        elif type(token) == str:
+        elif type(token) is str:
             return token
-        elif type(token) == bool:
+        elif type(token) is bool:
             return token
         elif token.type == "SIGNED_INT":
             return int(token)

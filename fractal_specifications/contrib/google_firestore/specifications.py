@@ -22,7 +22,7 @@ class SpecificationNotMappedToFirestore(Exception):
 
 class FirestoreSpecificationBuilder:
     @staticmethod
-    def build(specification: Specification = None) -> Optional[Collection]:
+    def build(specification: Optional[Specification] = None) -> Optional[Collection]:
         if specification is None:
             return None
         elif isinstance(specification, EmptySpecification):

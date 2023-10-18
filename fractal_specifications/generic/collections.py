@@ -19,7 +19,7 @@ class CollectionSpecification(Specification):
         return f"{self.__class__.__name__}({','.join(map(lambda s: str(s), self.specifications))})"
 
     def __eq__(self, other):
-        return type(self) == type(other) and self.specifications == other.specifications
+        return type(self) is type(other) and self.specifications == other.specifications
 
     def to_dict(self):
         return {

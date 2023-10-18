@@ -152,7 +152,7 @@ class Specification(ABC):
             }[self.__class__.__name__]
             if isinstance(self, operators.IsNoneSpecification):
                 return f"{lhs} {operator}"
-            rhs = f'"{self.value}"' if type(self.value) == str else repr(self.value)
+            rhs = f'"{self.value}"' if type(self.value) is str else repr(self.value)
             return f"{lhs} {operator} {rhs}"
         elif isinstance(
             self, (collections.AndSpecification, collections.OrSpecification)

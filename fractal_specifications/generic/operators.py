@@ -43,7 +43,7 @@ class FieldValueSpecification(Specification):
 
     def __eq__(self, other):
         return (
-            type(self) == type(other)
+            type(self) is type(other)
             and self.field == other.field
             and self.value == other.value
         )

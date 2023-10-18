@@ -18,7 +18,7 @@ class DjangoOrmSpecificationBuilder:
     @classmethod
     def build(
         cls,
-        specification: Specification = None,
+        specification: Optional[Specification] = None,
     ) -> Optional[Q]:
         if specification is None:
             return None
@@ -67,7 +67,7 @@ class DjangoOrmSpecificationBuilder:
 
     @staticmethod
     def _create_q(filters) -> Q:
-        if type(filters) == dict:
+        if type(filters) is dict:
             return Q(**filters)
         elif type(filters) in {list, set, tuple}:
             return Q(*filters)

@@ -21,7 +21,7 @@ class SpecificationNotMappedToElastic(Exception):
 
 class ElasticSpecificationBuilder:
     @staticmethod
-    def build(specification: Specification = None) -> Optional[dict]:
+    def build(specification: Optional[Specification] = None) -> Optional[dict]:
         if specification is None:
             return None
         elif isinstance(specification, EmptySpecification):

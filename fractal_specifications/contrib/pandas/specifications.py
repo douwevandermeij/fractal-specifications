@@ -17,7 +17,7 @@ class PandasSpecificationBuilder:
     @classmethod
     def build(
         cls,
-        specification: Specification = None,
+        specification: Optional[Specification] = None,
         *,
         return_mask=False,
     ) -> Optional[Callable[[pd.DataFrame], pd.Series]]:
