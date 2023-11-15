@@ -100,3 +100,16 @@ def test_empty():
     assert EmptySpecification().to_collection() == []
     assert str(EmptySpecification()) == "EmptySpecification"
     assert EmptySpecification() == EmptySpecification()
+
+
+def test_hash(equals_specification, complex_specification):
+    test_dict = {
+        equals_specification: True,
+        complex_specification: True,
+        equals_specification & complex_specification: True,
+        equals_specification | complex_specification: True,
+    }
+    assert test_dict[equals_specification]
+    assert test_dict[complex_specification]
+    assert test_dict[equals_specification & complex_specification]
+    assert test_dict[equals_specification | complex_specification]

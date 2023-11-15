@@ -21,6 +21,9 @@ class CollectionSpecification(Specification):
     def __eq__(self, other):
         return type(self) is type(other) and self.specifications == other.specifications
 
+    def __hash__(self):
+        return hash(tuple(self.specifications))
+
     def to_dict(self):
         return {
             "op": self.name(),

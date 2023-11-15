@@ -22,6 +22,9 @@ class NotSpecification(Specification):
             and self.specification == other.specification
         )
 
+    def __hash__(self):
+        return hash(self.specification)
+
     def to_dict(self):
         return {
             "op": self.name(),
@@ -48,6 +51,9 @@ class FieldValueSpecification(Specification):
             and self.value == other.value
         )
 
+    def __hash__(self):
+        return hash((self.field, self.value))
+
     def is_satisfied_by(self, obj: Any) -> bool:
         raise NotImplementedError
 
@@ -64,6 +70,9 @@ def _get_value(obj: Any, field: str) -> Any:
 class InSpecification(FieldValueSpecification):
     def __init__(self, field: str, values: List[Any]):
         super(InSpecification, self).__init__(field, values)
+
+    def __hash__(self):
+        return hash((self.field, tuple(self.value)))
 
     def is_satisfied_by(self, obj: Any) -> bool:
         return _get_value(obj, self.field) in self.value

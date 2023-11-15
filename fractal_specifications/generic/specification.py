@@ -195,3 +195,6 @@ class EmptySpecification(Specification):
 
     def __eq__(self, other):
         return isinstance(other, EmptySpecification)
+
+    def __hash__(self):
+        return 0
