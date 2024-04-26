@@ -10,7 +10,7 @@ from fractal_specifications.generic.specification import (
 
 
 class SpecificationNotMappedToPandas(Exception):
-    ...
+    pass
 
 
 class PandasSpecificationBuilder:

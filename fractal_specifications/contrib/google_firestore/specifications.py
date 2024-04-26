@@ -17,7 +17,7 @@ from fractal_specifications.generic.specification import (
 
 
 class SpecificationNotMappedToFirestore(Exception):
-    ...
+    pass
 
 
 class FirestoreSpecificationBuilder:

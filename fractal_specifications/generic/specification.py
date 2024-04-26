@@ -32,18 +32,20 @@ def all_specifications():
     }
 
 
-def _parse_specification_item(field_op: str, value: Any) -> Optional[Specification]:
+def _parse_specification_item(
+    field_op: str, value: Any, lookup_separator: str
+) -> Optional[Specification]:
     parts = field_op.split("__")
-    field = ".".join(parts[:-1])
+    field = lookup_separator.join(parts[:-1])
     op = parts[-1]
     if spec := all_specifications().get(op, None):
         return spec(field, value)
-    return all_specifications()["=="](".".join(parts), value)
+    return all_specifications()["=="](lookup_separator.join(parts), value)
 
 
-def parse_specification(**kwargs) -> Iterator[Specification]:
+def parse_specification(lookup_separator: str, **kwargs) -> Iterator[Specification]:
     for field_op, value in kwargs.items():
-        if spec := _parse_specification_item(field_op, value):
+        if spec := _parse_specification_item(field_op, value, lookup_separator):
             yield spec
 
 
@@ -92,8 +94,8 @@ class Specification(ABC):
         return NotSpecification(specification)
 
     @staticmethod
-    def parse(**kwargs):
-        specs = list(parse_specification(**kwargs))
+    def parse(_lookup_separator=".", **kwargs):
+        specs = list(parse_specification(lookup_separator=_lookup_separator, **kwargs))
         if len(specs) > 1:
             from fractal_specifications.generic.collections import AndSpecification
 

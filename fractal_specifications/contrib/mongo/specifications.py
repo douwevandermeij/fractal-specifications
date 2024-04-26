@@ -18,7 +18,7 @@ from fractal_specifications.generic.specification import (
 
 
 class SpecificationNotMappedToMongo(Exception):
-    ...
+    pass
 
 
 class MongoSpecificationBuilder:

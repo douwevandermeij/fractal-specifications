@@ -9,7 +9,7 @@ from fractal_specifications.generic.specification import (
 
 
 class SpecificationNotMappedToSqlAlchemyOrm(Exception):
-    ...
+    pass
 
 
 class SqlAlchemyOrmSpecificationBuilder:

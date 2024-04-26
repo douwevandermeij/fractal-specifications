@@ -11,7 +11,7 @@ from fractal_specifications.generic.specification import (
 
 
 class SpecificationNotMappedToDjangoOrm(Exception):
-    ...
+    pass
 
 
 class DjangoOrmSpecificationBuilder:

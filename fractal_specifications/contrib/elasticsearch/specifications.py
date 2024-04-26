@@ -16,7 +16,7 @@ from fractal_specifications.generic.specification import (
 
 
 class SpecificationNotMappedToElastic(Exception):
-    ...
+    pass
 
 
 class ElasticSpecificationBuilder:
