@@ -185,9 +185,14 @@ Using this contrib package requires `django` to be installed.
 
 Query support:
 * [x] Direct model fields `field=value`
-* [ ] Indirect model fields `field__sub_field=value`
-  * Implies recursive subfields `field__sub_field__sub_sub_field=value`
-  * This holds for all operators below as well
+* [x] Indirect model fields `field__sub_field=value`
+  * Example: `EqualsSpecification("field__sub_field", "abc")`
+    * Implies recursive subfields `field__sub_field__sub_sub_field=value`
+  * This holds for all operators below as well as for Django specific operators
+    * Example: `EqualsSpecification("field__sub_field__startswith", "ab")`
+  * When using parse:
+    * `Specification.parse(field__sub_field="abc", _lookup_separator="__")`
+    * `Specification.parse(field__sub_field__startswith="ab", _lookup_separator="__")`
 * [x] Equals `field=value` or `__exact`
 * [x] Less than `__lt`
 * [x] Less than equal `__lte`
