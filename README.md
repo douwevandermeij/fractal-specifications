@@ -190,9 +190,10 @@ Query support:
     * Implies recursive subfields `field__sub_field__sub_sub_field=value`
   * This holds for all operators below as well as for Django specific operators
     * Example: `EqualsSpecification("field__sub_field__startswith", "ab")`
-  * When using parse:
+  * When using parse, make sure to use the `_lookup_separator="__"`:
+    * Default, the resulting parsed specification will contain `"."` as separator
     * `Specification.parse(field__sub_field="abc", _lookup_separator="__")`
-    * `Specification.parse(field__sub_field__startswith="ab", _lookup_separator="__")`
+      * Will result in: `EqualsSpecification("field__sub_field", "abc")` instead of `EqualsSpecification("field.sub_field", "abc")`
 * [x] Equals `field=value` or `__exact`
 * [x] Less than `__lt`
 * [x] Less than equal `__lte`
