@@ -2,45 +2,75 @@ from typing import Any, Collection
 
 import pytest
 
-specifications = [
-    (None, None),
-    (pytest.lazy_fixture("equals_specification"), {"id": {"$eq": 1}}),  # type: ignore
-    (
-        pytest.lazy_fixture("or_specification"),  # type: ignore
-        {"$or": [{"id": {"$eq": 1}}, {"name": {"$eq": "test"}}]},
-    ),
-    (
-        pytest.lazy_fixture("and_specification"),  # type: ignore
-        {"$and": [{"id": {"$eq": 1}}, {"name": {"$eq": "test"}}]},
-    ),
-    (pytest.lazy_fixture("in_specification"), {"field": {"$in": [1, 2, 3]}}),  # type: ignore
-    (pytest.lazy_fixture("less_than_specification"), {"id": {"$lt": 1}}),  # type: ignore
-    (pytest.lazy_fixture("less_than_equal_specification"), {"id": {"$lte": 1}}),  # type: ignore
-    (pytest.lazy_fixture("greater_than_specification"), {"id": {"$gt": 1}}),  # type: ignore
-    (pytest.lazy_fixture("greater_than_equal_specification"), {"id": {"$gte": 1}}),  # type: ignore
-    (pytest.lazy_fixture("regex_string_match_specification"), {"id": {"$regex": ".*abc.*"}}),  # type: ignore
-    (
-        pytest.lazy_fixture("dict_specification"),  # type: ignore
-        {"$and": [{"id": {"$eq": 1}}, {"test": {"$eq": 2}}]},
-    ),
-    (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
-]
+from fractal_specifications.contrib.mongo.specifications import (
+    MongoSpecificationBuilder,
+    SpecificationNotMappedToMongo,
+)
 
 
-@pytest.mark.parametrize("specification, expected", specifications)
-def test_build(specification, expected):
-    from fractal_specifications.contrib.mongo.specifications import (
-        MongoSpecificationBuilder,
-    )
+def test_build_none():
+    assert MongoSpecificationBuilder.build(None) == None
 
-    assert MongoSpecificationBuilder.build(specification) == expected
+
+def test_build_equals_specification(equals_specification):
+    assert MongoSpecificationBuilder.build(equals_specification) == {"id": {"$eq": 1}}
+
+
+def test_build_or_specification(or_specification):
+    assert MongoSpecificationBuilder.build(or_specification) == {"$or": [{"id": {"$eq": 1}}, {"name": {"$eq": "test"}}]}
+
+
+def test_build_and_specification(and_specification):
+    assert MongoSpecificationBuilder.build(and_specification) == {"$and": [{"id": {"$eq": 1}}, {"name": {"$eq": "test"}}]}
+
+
+def test_build_contains_specification(contains_specification):
+    with pytest.raises(SpecificationNotMappedToMongo):
+        MongoSpecificationBuilder.build(contains_specification)
+
+
+def test_build_in_specification(in_specification):
+    assert MongoSpecificationBuilder.build(in_specification) == {"field": {"$in": [1, 2, 3]}}
+
+
+def test_build_in_empty_specification(in_empty_specification):
+    assert MongoSpecificationBuilder.build(in_empty_specification) == {'field': {'$in': []}}
+
+
+def test_build_less_than_specification(less_than_specification):
+    assert MongoSpecificationBuilder.build(less_than_specification) == {"id": {"$lt": 1}}
+
+
+def test_build_less_than_equal_specification(less_than_equal_specification):
+    assert MongoSpecificationBuilder.build(less_than_equal_specification) == {"id": {"$lte": 1}}
+
+
+def test_build_greater_than_specification(greater_than_specification):
+    assert MongoSpecificationBuilder.build(greater_than_specification) == {"id": {"$gt": 1}}
+
+
+def test_build_greater_than_equal_specification(greater_than_equal_specification):
+    assert MongoSpecificationBuilder.build(greater_than_equal_specification) == {"id": {"$gte": 1}}
+
+
+def test_build_regex_string_match_specification(regex_string_match_specification):
+    assert MongoSpecificationBuilder.build(regex_string_match_specification) == {"id": {"$regex": ".*abc.*"}}
+
+
+def test_build_is_none_specification(is_none_specification):
+    with pytest.raises(SpecificationNotMappedToMongo):
+        MongoSpecificationBuilder.build(is_none_specification)
+
+
+def test_build_dict_specification(dict_specification):
+    assert MongoSpecificationBuilder.build(dict_specification) == {"$and": [{"id": {"$eq": 1}}, {"test": {"$eq": 2}}]}
+
+
+def test_build_empty_specification(empty_specification):
+    assert MongoSpecificationBuilder.build(empty_specification) == None
 
 
 def test_specification_not_mapped():
-    from fractal_specifications.contrib.mongo.specifications import (
-        MongoSpecificationBuilder,
-        SpecificationNotMappedToMongo,
-    )
     from fractal_specifications.generic.specification import Specification
 
     class ErrorSpecification(Specification):

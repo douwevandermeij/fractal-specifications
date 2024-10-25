@@ -114,6 +114,9 @@ def dict_specification():
         def to_collection(self) -> dict:
             return self.collection
 
+        def __str__(self):
+            return f"{self.__class__.__name__}({self.collection})"
+
     return DictSpecification({"id": 1, "test": 2})
 
 
