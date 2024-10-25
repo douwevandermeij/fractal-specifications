@@ -3,6 +3,12 @@ from typing import Any, Collection
 import pandas as pd  # type: ignore
 import pytest  # type: ignore
 
+from fractal_specifications.contrib.pandas.specifications import (
+    PandasIndexSpecificationBuilder,
+    PandasSpecificationBuilder,
+    SpecificationNotMappedToPandas,
+)
+
 df = pd.DataFrame(
     {
         "id": [1, 2, 3, 4],
@@ -13,71 +19,102 @@ df = pd.DataFrame(
 
 dfi = df.set_index(["id", "name", "field"])
 
-specifications = [
-    (None, None),
-    (pytest.lazy_fixture("equals_specification"), df[df.id == 1].to_dict()),  # type: ignore
-    (
-        pytest.lazy_fixture("or_specification"),  # type: ignore
-        (df[(df.id == 1) | (df.name == "test")]).to_dict(),
-    ),
-    (
-        pytest.lazy_fixture("and_specification"),  # type: ignore
-        (df[(df.id == 1) & (df.name == "test")]).to_dict(),
-    ),
-    (pytest.lazy_fixture("in_specification"), df[df.field.isin([1, 2, 3])].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("less_than_specification"), df[df.id < 1].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("less_than_equal_specification"), df[df.id <= 1].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("greater_than_specification"), df[df.id > 1].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("greater_than_equal_specification"), df[df.id >= 1].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
-]
 
-specifications_index = [
-    (None, None),
-    (pytest.lazy_fixture("equals_specification"), dfi[dfi.index.get_level_values("id") == 1].to_dict()),  # type: ignore
-    (
-        pytest.lazy_fixture("or_specification"),  # type: ignore
-        (
-            dfi[
-                (dfi.index.get_level_values("id") == 1)
-                | (dfi.index.get_level_values("name") == "test")
-            ]
-        ).to_dict(),
-    ),
-    (
-        pytest.lazy_fixture("and_specification"),  # type: ignore
-        (
-            dfi[
-                (dfi.index.get_level_values("id") == 1)
-                & (dfi.index.get_level_values("name") == "test")
-            ]
-        ).to_dict(),
-    ),
-    (pytest.lazy_fixture("in_specification"), dfi[dfi.index.get_level_values("field").isin([1, 2, 3])].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("less_than_specification"), dfi[dfi.index.get_level_values("id") < 1].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("less_than_equal_specification"), dfi[dfi.index.get_level_values("id") <= 1].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("greater_than_specification"), dfi[dfi.index.get_level_values("id") > 1].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("greater_than_equal_specification"), dfi[dfi.index.get_level_values("id") >= 1].to_dict()),  # type: ignore
-    (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
-]
+def test_build_none():
+    assert PandasSpecificationBuilder.build(None) == None
 
 
-@pytest.mark.parametrize("specification, expected", specifications)
-def test_build(specification, expected):
-    from fractal_specifications.contrib.pandas.specifications import (
-        PandasSpecificationBuilder,
+def test_build_equals_specification(equals_specification):
+    assert (
+        PandasSpecificationBuilder.build(equals_specification)(df).to_dict()
+        == df[df.id == 1].to_dict()
     )
 
-    f = PandasSpecificationBuilder.build(specification)
 
-    assert f == expected or f(df).to_dict() == expected
+def test_build_or_specification(or_specification):
+    assert (
+        PandasSpecificationBuilder.build(or_specification)(df).to_dict()
+        == (df[(df.id == 1) | (df.name == "test")]).to_dict()
+    )
+
+
+def test_build_and_specification(and_specification):
+    assert (
+        PandasSpecificationBuilder.build(and_specification)(df).to_dict()
+        == (df[(df.id == 1) & (df.name == "test")]).to_dict()
+    )
+
+
+def test_build_contains_specification(contains_specification):
+    with pytest.raises(SpecificationNotMappedToPandas):
+        PandasSpecificationBuilder.build(contains_specification)
+
+
+def test_build_in_specification(in_specification):
+    assert (
+        PandasSpecificationBuilder.build(in_specification)(df).to_dict()
+        == df[df.field.isin([1, 2, 3])].to_dict()
+    )
+
+
+def test_build_in_empty_specification(in_empty_specification):
+    assert (
+        PandasSpecificationBuilder.build(in_empty_specification)(df).to_dict()
+        == df[df.field.isin([])].to_dict()
+    )
+
+
+def test_build_less_than_specification(less_than_specification):
+    assert (
+        PandasSpecificationBuilder.build(less_than_specification)(df).to_dict()
+        == df[df.id < 1].to_dict()
+    )
+
+
+def test_build_less_than_equal_specification(less_than_equal_specification):
+    assert (
+        PandasSpecificationBuilder.build(less_than_equal_specification)(df).to_dict()
+        == df[df.id <= 1].to_dict()
+    )
+
+
+def test_build_greater_than_specification(greater_than_specification):
+    assert (
+        PandasSpecificationBuilder.build(greater_than_specification)(df).to_dict()
+        == df[df.id > 1].to_dict()
+    )
+
+
+def test_build_greater_than_equal_specification(greater_than_equal_specification):
+    assert (
+        PandasSpecificationBuilder.build(greater_than_equal_specification)(df).to_dict()
+        == df[df.id >= 1].to_dict()
+    )
+
+
+def test_build_regex_string_match_specification(regex_string_match_specification):
+    with pytest.raises(SpecificationNotMappedToPandas):
+        PandasSpecificationBuilder.build(regex_string_match_specification)
+
+
+def test_build_is_none_specification(is_none_specification):
+    assert PandasSpecificationBuilder.build(is_none_specification)(df).to_dict() == {
+        "field": {},
+        "id": {},
+        "name": {},
+    }
+
+
+def test_build_dict_specification(dict_specification):
+    with pytest.raises(SpecificationNotMappedToPandas):
+        PandasSpecificationBuilder.build(dict_specification)
+
+
+def test_build_empty_specification(empty_specification):
+    assert PandasSpecificationBuilder.build(empty_specification) == None
 
 
 def test_specification_not_mapped():
-    from fractal_specifications.contrib.pandas.specifications import (
-        PandasSpecificationBuilder,
-        SpecificationNotMappedToPandas,
-    )
     from fractal_specifications.generic.specification import Specification
 
     class ErrorSpecification(Specification):
@@ -94,22 +131,118 @@ def test_specification_not_mapped():
         PandasSpecificationBuilder.build(ErrorSpecification())
 
 
-@pytest.mark.parametrize("specification, expected", specifications_index)
-def test_build_with_index(specification, expected):
-    from fractal_specifications.contrib.pandas.specifications import (
-        PandasIndexSpecificationBuilder,
+def test_build_with_index_none():
+    assert PandasIndexSpecificationBuilder.build(None) == None
+
+
+def test_build_with_index_equals_specification(equals_specification):
+    assert (
+        PandasIndexSpecificationBuilder.build(equals_specification)(dfi).to_dict()
+        == dfi[dfi.index.get_level_values("id") == 1].to_dict()
     )
 
-    f = PandasIndexSpecificationBuilder.build(specification)
 
-    assert f == expected or f(dfi).to_dict() == expected
+def test_build_with_index_or_specification(or_specification):
+    assert (
+        PandasIndexSpecificationBuilder.build(or_specification)(dfi).to_dict()
+        == (
+            dfi[
+                (dfi.index.get_level_values("id") == 1)
+                | (dfi.index.get_level_values("name") == "test")
+            ]
+        ).to_dict()
+    )
+
+
+def test_build_with_index_and_specification(and_specification):
+    assert (
+        PandasIndexSpecificationBuilder.build(and_specification)(dfi).to_dict()
+        == (
+            dfi[
+                (dfi.index.get_level_values("id") == 1)
+                & (dfi.index.get_level_values("name") == "test")
+            ]
+        ).to_dict()
+    )
+
+
+def test_build_with_index_contains_specification(contains_specification):
+    with pytest.raises(SpecificationNotMappedToPandas):
+        PandasIndexSpecificationBuilder.build(contains_specification)
+
+
+def test_build_with_index_in_specification(in_specification):
+    assert (
+        PandasIndexSpecificationBuilder.build(in_specification)(dfi).to_dict()
+        == dfi[dfi.index.get_level_values("field").isin([1, 2, 3])].to_dict()
+    )
+
+
+def test_build_with_index_in_empty_specification(in_empty_specification):
+    assert (
+        PandasIndexSpecificationBuilder.build(in_empty_specification)(dfi).to_dict()
+        == dfi[dfi.index.get_level_values("field").isin([])].to_dict()
+    )
+
+
+def test_build_with_index_less_than_specification(less_than_specification):
+    assert (
+        PandasIndexSpecificationBuilder.build(less_than_specification)(dfi).to_dict()
+        == dfi[dfi.index.get_level_values("id") < 1].to_dict()
+    )
+
+
+def test_build_with_index_less_than_equal_specification(less_than_equal_specification):
+    assert (
+        PandasIndexSpecificationBuilder.build(less_than_equal_specification)(
+            dfi
+        ).to_dict()
+        == dfi[dfi.index.get_level_values("id") <= 1].to_dict()
+    )
+
+
+def test_build_with_index_greater_than_specification(greater_than_specification):
+    assert (
+        PandasIndexSpecificationBuilder.build(greater_than_specification)(dfi).to_dict()
+        == dfi[dfi.index.get_level_values("id") > 1].to_dict()
+    )
+
+
+def test_build_with_index_greater_than_equal_specification(
+    greater_than_equal_specification,
+):
+    assert (
+        PandasIndexSpecificationBuilder.build(greater_than_equal_specification)(
+            dfi
+        ).to_dict()
+        == dfi[dfi.index.get_level_values("id") >= 1].to_dict()
+    )
+
+
+def test_build_with_index_regex_string_match_specification(
+    regex_string_match_specification,
+):
+    with pytest.raises(SpecificationNotMappedToPandas):
+        PandasIndexSpecificationBuilder.build(regex_string_match_specification)
+
+
+def test_build_with_index_is_none_specification(is_none_specification):
+    assert (
+        PandasIndexSpecificationBuilder.build(is_none_specification)(dfi).to_dict()
+        == {}
+    )
+
+
+def test_build_with_index_dict_specification(dict_specification):
+    with pytest.raises(SpecificationNotMappedToPandas):
+        PandasIndexSpecificationBuilder.build(dict_specification)
+
+
+def test_build_with_index_empty_specification(empty_specification):
+    assert PandasIndexSpecificationBuilder.build(empty_specification) == None
 
 
 def test_specification_not_mapped_with_index():
-    from fractal_specifications.contrib.pandas.specifications import (
-        PandasIndexSpecificationBuilder,
-        SpecificationNotMappedToPandas,
-    )
     from fractal_specifications.generic.specification import Specification
 
     class ErrorSpecification(Specification):

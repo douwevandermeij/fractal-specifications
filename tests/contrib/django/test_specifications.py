@@ -3,55 +3,102 @@ from typing import Any, Collection
 import pytest
 from django.db.models import Q  # type: ignore
 
-specifications = [
-    (None, None),
-    (pytest.lazy_fixture("equals_specification"), Q(id=1)),  # type: ignore
-    (pytest.lazy_fixture("or_specification"), Q(id=1) | Q(name="test")),  # type: ignore
-    (pytest.lazy_fixture("and_specification"), Q(id=1, name="test")),  # type: ignore
-    (pytest.lazy_fixture("in_specification"), Q(field__in=[1, 2, 3])),  # type: ignore
-    (pytest.lazy_fixture("less_than_specification"), Q(id__lt=1)),  # type: ignore
-    (pytest.lazy_fixture("less_than_equal_specification"), Q(id__lte=1)),  # type: ignore
-    (pytest.lazy_fixture("greater_than_specification"), Q(id__gt=1)),  # type: ignore
-    (pytest.lazy_fixture("greater_than_equal_specification"), Q(id__gte=1)),  # type: ignore
-    (pytest.lazy_fixture("regex_string_match_specification"), Q(id__regex=".*abc.*")),  # type: ignore
-    (pytest.lazy_fixture("is_none_specification"), Q(field__isnull=True)),  # type: ignore
-    (pytest.lazy_fixture("dict_specification"), Q(id=1, test=2)),  # type: ignore
-    (pytest.lazy_fixture("empty_specification"), None),  # type: ignore
-]
+from fractal_specifications.contrib.django.specifications import (
+    DjangoOrmSpecificationBuilder,
+    SpecificationNotMappedToDjangoOrm,
+)
 
 
-@pytest.mark.parametrize("specification, expected", specifications)
-def test_build(specification, expected):
-    from fractal_specifications.contrib.django.specifications import (
-        DjangoOrmSpecificationBuilder,
+def test_build_none():
+    assert DjangoOrmSpecificationBuilder.build(None) == None
+
+
+def test_build_equals_specification(equals_specification):
+    assert DjangoOrmSpecificationBuilder.build(equals_specification) == Q(id=1)
+
+
+def test_build_or_specification(or_specification):
+    assert DjangoOrmSpecificationBuilder.build(or_specification) == Q(id=1) | Q(
+        name="test"
     )
 
-    assert DjangoOrmSpecificationBuilder.build(specification) == expected
+
+def test_build_and_specification(and_specification):
+    assert DjangoOrmSpecificationBuilder.build(and_specification) == Q(
+        id=1, name="test"
+    )
+
+
+def test_build_contains_specification(contains_specification):
+    with pytest.raises(SpecificationNotMappedToDjangoOrm):
+        DjangoOrmSpecificationBuilder.build(contains_specification)
+
+
+def test_build_in_specification(in_specification):
+    assert DjangoOrmSpecificationBuilder.build(in_specification) == Q(
+        field__in=[1, 2, 3]
+    )
+
+
+def test_build_in_empty_specification(in_empty_specification):
+    assert DjangoOrmSpecificationBuilder.build(in_empty_specification) == Q(
+        field__in=[]
+    )
+
+
+def test_build_less_than_specification(less_than_specification):
+    assert DjangoOrmSpecificationBuilder.build(less_than_specification) == Q(id__lt=1)
+
+
+def test_build_less_than_equal_specification(less_than_equal_specification):
+    assert DjangoOrmSpecificationBuilder.build(less_than_equal_specification) == Q(
+        id__lte=1
+    )
+
+
+def test_build_greater_than_specification(greater_than_specification):
+    assert DjangoOrmSpecificationBuilder.build(greater_than_specification) == Q(
+        id__gt=1
+    )
+
+
+def test_build_greater_than_equal_specification(greater_than_equal_specification):
+    assert DjangoOrmSpecificationBuilder.build(greater_than_equal_specification) == Q(
+        id__gte=1
+    )
+
+
+def test_build_regex_string_match_specification(regex_string_match_specification):
+    assert DjangoOrmSpecificationBuilder.build(regex_string_match_specification) == Q(
+        id__regex=".*abc.*"
+    )
+
+
+def test_build_is_none_specification(is_none_specification):
+    assert DjangoOrmSpecificationBuilder.build(is_none_specification) == Q(
+        field__isnull=True
+    )
+
+
+def test_build_dict_specification(dict_specification):
+    assert DjangoOrmSpecificationBuilder.build(dict_specification) == Q(id=1, test=2)
+
+
+def test_build_empty_specification(empty_specification):
+    assert DjangoOrmSpecificationBuilder.build(empty_specification) == None
 
 
 def test_create_q_dict():
-    from fractal_specifications.contrib.django.specifications import (
-        DjangoOrmSpecificationBuilder,
-    )
-
     assert isinstance(DjangoOrmSpecificationBuilder._create_q({"id": 1}), Q)
     assert DjangoOrmSpecificationBuilder._create_q({"id": 1}).children == [("id", 1)]
 
 
 def test_create_q_list():
-    from fractal_specifications.contrib.django.specifications import (
-        DjangoOrmSpecificationBuilder,
-    )
-
     assert isinstance(DjangoOrmSpecificationBuilder._create_q([("id", 1)]), Q)
     assert DjangoOrmSpecificationBuilder._create_q([("id", 1)]).children == [("id", 1)]
 
 
 def test_specification_not_mapped():
-    from fractal_specifications.contrib.django.specifications import (
-        DjangoOrmSpecificationBuilder,
-        SpecificationNotMappedToDjangoOrm,
-    )
     from fractal_specifications.generic.specification import Specification
 
     class ErrorSpecification(Specification):

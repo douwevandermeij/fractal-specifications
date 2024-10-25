@@ -98,6 +98,26 @@ def test_contains_specification():
     assert spec.is_satisfied_by(DC(**dict(name="fractal")))
 
 
+def test_contains_dot_specification():
+    spec = ContainsSpecification("obj.name", "a")
+    DC = make_dataclass("DC", [("name", str)])
+    OBJ = make_dataclass("OBJ", [("obj", DC)])
+    assert spec.is_satisfied_by(OBJ(obj=DC(name="fractal")))
+
+
+def test_contains_double_underscore_specification():
+    spec = ContainsSpecification("obj__name", "a")
+    DC = make_dataclass("DC", [("name", str)])
+    OBJ = make_dataclass("OBJ", [("obj", DC)])
+    assert spec.is_satisfied_by(OBJ(obj=DC(name="fractal")))
+
+
+def test_contains_none_specification():
+    spec = ContainsSpecification("name", "a")
+    DC = make_dataclass("DC", [("name", None)])
+    assert not spec.is_satisfied_by(DC(**dict(name=None)))
+
+
 def test_list_contains_specification():
     spec = ContainsSpecification("names", "fractal")
     DC = make_dataclass("DC", [("names", list)])

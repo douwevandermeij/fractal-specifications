@@ -1,7 +1,10 @@
 from typing import Collection, Optional
 
 from fractal_specifications.generic.collections import AndSpecification, OrSpecification
-from fractal_specifications.generic.operators import EqualsSpecification
+from fractal_specifications.generic.operators import (
+    EqualsSpecification,
+    InSpecification,
+)
 from fractal_specifications.generic.specification import (
     EmptySpecification,
     Specification,
@@ -35,6 +38,10 @@ class SqlAlchemyOrmSpecificationBuilder:
             }
         elif isinstance(specification, EqualsSpecification):
             return {specification.field: specification.value}
+        elif isinstance(specification, InSpecification):
+            raise SpecificationNotMappedToSqlAlchemyOrm(
+                f"Specification '{specification}' not mapped to SqlAlchemy Orm query."
+            )
         elif isinstance(specification.to_collection(), dict):
             return specification.to_collection()
         raise SpecificationNotMappedToSqlAlchemyOrm(

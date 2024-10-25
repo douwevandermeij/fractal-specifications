@@ -62,7 +62,8 @@ class FieldValueSpecification(Specification):
 
 
 def _get_value(obj: Any, field: str) -> Any:
-    for f in field.split("."):
+    lookup_separator = "__" if "__" in field else "."
+    for f in field.split(lookup_separator):
         obj = getattr(obj, f)
     return obj
 
@@ -138,7 +139,10 @@ class GreaterThanEqualSpecification(FieldValueSpecification):
 
 class ContainsSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return self.value in _get_value(obj, self.field)
+        value = _get_value(obj, self.field)
+        if not value:
+            return False
+        return self.value in value
 
 
 class RegexStringMatchSpecification(ContainsSpecification):
