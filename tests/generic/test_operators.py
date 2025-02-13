@@ -1,4 +1,5 @@
 from dataclasses import make_dataclass
+from typing import List
 
 from fractal_specifications.generic.operators import (
     ContainsSpecification,
@@ -160,7 +161,7 @@ def test_pre_process_contains_specification():
 
 def test_pre_process_list_contains_specification():
     spec = ContainsSpecification("roles", "ADMIN", lambda i: [r.upper() for r in i])
-    DC = make_dataclass("DC", [("roles", list[str])])
+    DC = make_dataclass("DC", [("roles", List[str])])
     assert spec.is_satisfied_by(DC(**dict(roles=["admin", "owner"])))
 
 
@@ -168,5 +169,5 @@ def test_pre_process_regex_string_match_specification():
     spec = RegexStringMatchSpecification(
         "roles", "a.*n", lambda i: ",".join([r.lower() for r in i])
     )
-    DC = make_dataclass("DC", [("roles", list[str])])
+    DC = make_dataclass("DC", [("roles", List[str])])
     assert spec.is_satisfied_by(DC(**dict(roles=["admin", "owner"])))
