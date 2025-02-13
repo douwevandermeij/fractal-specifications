@@ -114,6 +114,43 @@ if __name__ == "__main__":
     print(road_repository.slow_roads())
 ```
 
+### Pre-processing
+
+Since version 3.3.0 pre-processing object values is supported.
+A pre-processor is a regular Python function that returns the same type as its (only) parameter.
+Pre-processors can be used in all specifications derived from `FieldValueSpecification`.
+
+For example, your repository contains objects with string values (e.g., users with a name and roles).
+These strings may contain lowercase and uppercase characters and/or be part of a list.
+
+```python
+user_repository = UserRepository([
+    User(name="John", roles=["admin", "billing"]),
+    User(name="Jane", roles=["admin", "owner"]),
+])
+```
+
+To find user "John", you can use the following specification:
+
+```python
+EqualsSpecification("name", "John")
+```
+
+However, you might also want to find "John" using the lowercase value "john" or partial value "jo".
+
+You can do so by using a pre-processor as the third parameter:
+
+```python
+EqualsSpecification("name", "john", lambda i: i.lower())
+ContainsSpecification("name", "jo", lambda i: i.lower())
+```
+
+This also works for list values:
+
+```python
+ContainsSpecification("roles", "BILLING", lambda i: [r.upper() for r in i])
+```
+
 ## Serialization / deserialization
 
 Specifications can be exported as dictionary and loaded as such via `spec.to_dict()` and `Specification.from_dict(d)` respectively.

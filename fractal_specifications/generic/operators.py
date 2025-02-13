@@ -1,4 +1,4 @@
-from typing import Any, Collection, List
+from typing import Any, Callable, Collection, List
 
 from fractal_specifications.generic.specification import Specification
 
@@ -37,9 +37,10 @@ class NotSpecification(Specification):
 
 
 class FieldValueSpecification(Specification):
-    def __init__(self, field: str, value: Any):
+    def __init__(self, field: str, value: Any, pre_processor: Callable = lambda i: i):
         self.field = field
         self.value = value
+        self.pre_processor = pre_processor
 
     def __str__(self):
         return f"{self.__class__.__name__}({self.field}={self.value})"
@@ -76,7 +77,7 @@ class InSpecification(FieldValueSpecification):
         return hash((self.field, tuple(self.value)))
 
     def is_satisfied_by(self, obj: Any) -> bool:
-        return _get_value(obj, self.field) in self.value
+        return self.pre_processor(_get_value(obj, self.field)) in self.value
 
     @classmethod
     def _from_dict(cls, d: dict):
@@ -85,7 +86,7 @@ class InSpecification(FieldValueSpecification):
 
 class EqualsSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return _get_value(obj, self.field) == self.value
+        return self.pre_processor(_get_value(obj, self.field)) == self.value
 
     @classmethod
     def name(cls):
@@ -94,7 +95,7 @@ class EqualsSpecification(FieldValueSpecification):
 
 class NotEqualsSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return _get_value(obj, self.field) != self.value
+        return self.pre_processor(_get_value(obj, self.field)) != self.value
 
     @classmethod
     def name(cls):
@@ -103,7 +104,7 @@ class NotEqualsSpecification(FieldValueSpecification):
 
 class LessThanSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return _get_value(obj, self.field) < self.value
+        return self.pre_processor(_get_value(obj, self.field)) < self.value
 
     @classmethod
     def name(cls):
@@ -112,7 +113,7 @@ class LessThanSpecification(FieldValueSpecification):
 
 class LessThanEqualSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return _get_value(obj, self.field) <= self.value
+        return self.pre_processor(_get_value(obj, self.field)) <= self.value
 
     @classmethod
     def name(cls):
@@ -121,7 +122,7 @@ class LessThanEqualSpecification(FieldValueSpecification):
 
 class GreaterThanSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return _get_value(obj, self.field) > self.value
+        return self.pre_processor(_get_value(obj, self.field)) > self.value
 
     @classmethod
     def name(cls):
@@ -130,7 +131,7 @@ class GreaterThanSpecification(FieldValueSpecification):
 
 class GreaterThanEqualSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return _get_value(obj, self.field) >= self.value
+        return self.pre_processor(_get_value(obj, self.field)) >= self.value
 
     @classmethod
     def name(cls):
@@ -139,7 +140,7 @@ class GreaterThanEqualSpecification(FieldValueSpecification):
 
 class ContainsSpecification(FieldValueSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        value = _get_value(obj, self.field)
+        value = self.pre_processor(_get_value(obj, self.field))
         if not value:
             return False
         return self.value in value
@@ -149,7 +150,9 @@ class RegexStringMatchSpecification(ContainsSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
         import re
 
-        return bool(re.match(self.value, _get_value(obj, self.field)))
+        return bool(
+            re.match(self.value, self.pre_processor(_get_value(obj, self.field)))
+        )
 
     @classmethod
     def name(cls):
@@ -164,7 +167,7 @@ class IsNoneSpecification(FieldValueSpecification):
         return f"{self.__class__.__name__}({self.field})"
 
     def is_satisfied_by(self, obj: Any) -> bool:
-        return _get_value(obj, self.field) is None
+        return self.pre_processor(_get_value(obj, self.field)) is None
 
     @classmethod
     def _from_dict(cls, d: dict):

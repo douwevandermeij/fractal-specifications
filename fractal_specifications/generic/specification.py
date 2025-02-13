@@ -109,7 +109,11 @@ class Specification(ABC):
             **{
                 "op": self.name(),
             },
-            **self.__dict__,
+            **{
+                key: value
+                for key, value in self.__dict__.items()
+                if not callable(value)
+            },
         }
 
     @classmethod

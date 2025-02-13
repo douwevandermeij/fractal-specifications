@@ -144,3 +144,29 @@ def test_is_none_specification_str():
 def test_is_none_specification_repr():
     spec = IsNoneSpecification("name")
     assert spec.__repr__() == "IsNoneSpecification(name)"
+
+
+def test_pre_process_equals_specification():
+    spec = EqualsSpecification("name", "abc", lambda i: i.lower())
+    DC = make_dataclass("DC", [("name", str)])
+    assert spec.is_satisfied_by(DC(**dict(name="ABC")))
+
+
+def test_pre_process_contains_specification():
+    spec = ContainsSpecification("name", "A", lambda i: i.upper())
+    DC = make_dataclass("DC", [("name", str)])
+    assert spec.is_satisfied_by(DC(**dict(name="fractal")))
+
+
+def test_pre_process_list_contains_specification():
+    spec = ContainsSpecification("roles", "ADMIN", lambda i: [r.upper() for r in i])
+    DC = make_dataclass("DC", [("roles", list[str])])
+    assert spec.is_satisfied_by(DC(**dict(roles=["admin", "owner"])))
+
+
+def test_pre_process_regex_string_match_specification():
+    spec = RegexStringMatchSpecification(
+        "roles", "a.*n", lambda i: ",".join([r.lower() for r in i])
+    )
+    DC = make_dataclass("DC", [("roles", list[str])])
+    assert spec.is_satisfied_by(DC(**dict(roles=["admin", "owner"])))
