@@ -151,6 +151,9 @@ This also works for list values:
 ContainsSpecification("roles", "BILLING", lambda i: [r.upper() for r in i])
 ```
 
+Pre-processing currently **only** works for plain Python usage, so when manually using the `is_satisfied_by` function.
+Pre-processors are not (yet) used in the "SpecificationBuilders" in `contrib`.
+
 ## Serialization / deserialization
 
 Specifications can be exported as dictionary and loaded as such via `spec.to_dict()` and `Specification.from_dict(d)` respectively.
@@ -160,6 +163,10 @@ Specifications can also be exported to JSON via `spec.dumps()`. This essentially
 JSON specification strings can be loaded directly as Specification object via `Specification.loads(s)`.
 
 Via this mechanism, specifications can be used outside the application runtime environment. For example, in a database or sent via API.
+
+### Pre-processing
+
+Since version 3.3.0 pre-processing object values is supported, but these pre-processors will **not** be part of the serialization.
 
 ### Domain Specific Language (DSL)
 
