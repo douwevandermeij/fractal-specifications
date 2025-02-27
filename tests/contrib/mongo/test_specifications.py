@@ -88,6 +88,14 @@ def test_build_dict_specification(dict_specification):
 
 def test_build_empty_specification(empty_specification):
     assert MongoSpecificationBuilder.build(empty_specification) == None
+    assert (
+        MongoSpecificationBuilder.build(empty_specification & empty_specification)
+        == None
+    )
+    assert (
+        MongoSpecificationBuilder.build(empty_specification | empty_specification)
+        == None
+    )
 
 
 def test_specification_not_mapped():

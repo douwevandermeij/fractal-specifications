@@ -29,21 +29,19 @@ class MongoSpecificationBuilder:
         elif isinstance(specification, EmptySpecification):
             return None
         elif isinstance(specification, AndSpecification):
-            return {
-                "$and": [
-                    s
-                    for spec in specification.to_collection()
-                    if (s := MongoSpecificationBuilder.build(spec))
-                ]
-            }
+            specs = [
+                s
+                for spec in specification.to_collection()
+                if (s := MongoSpecificationBuilder.build(spec))
+            ]
+            return {"$and": specs} if specs else None
         elif isinstance(specification, OrSpecification):
-            return {
-                "$or": [
-                    s
-                    for spec in specification.to_collection()
-                    if (s := MongoSpecificationBuilder.build(spec))
-                ]
-            }
+            specs = [
+                s
+                for spec in specification.to_collection()
+                if (s := MongoSpecificationBuilder.build(spec))
+            ]
+            return {"$or": specs} if specs else None
         elif isinstance(specification, InSpecification):
             return {specification.field: {"$in": specification.value}}
         elif isinstance(specification, EqualsSpecification):
@@ -61,12 +59,11 @@ class MongoSpecificationBuilder:
                 specification.field: {"$regex": f".*{re.escape(specification.value)}.*"}
             }
         elif isinstance(specification.to_collection(), dict):
-            return {
-                "$and": [
-                    {key: {"$eq": value}}
-                    for key, value in dict(specification.to_collection()).items()
-                ]
-            }
+            specs = [
+                {key: {"$eq": value}}
+                for key, value in dict(specification.to_collection()).items()
+            ]
+            return {"$and": specs} if specs else None
         raise SpecificationNotMappedToMongo(
             f"Specification '{specification}' not mapped to Mongo query."
         )
