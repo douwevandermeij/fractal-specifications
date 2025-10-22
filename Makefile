@@ -1,48 +1,69 @@
-.DEFAULT_GOAL := help
-.PHONY: coverage deps help lint publish push sonar test tox
+.PHONY: help install deps dev-deps test lint format clean build publish dev-install
 
-coverage:  ## Run tests with coverage
-	rm .coverage ||:
-	rm coverage.xml ||:
-	pytest --cov fractal_specifications --cov-report=xml
+# Default target
+help:
+	@echo "Available targets:"
+	@echo "  install      - Install the package using uv"
+	@echo "  deps         - Install production dependencies (for CI)"
+	@echo "  dev-deps     - Install development dependencies"
+	@echo "  dev-install  - Install package in development mode with all dependencies"
+	@echo "  test         - Run tests with pytest"
+	@echo "  lint         - Run linters (ruff)"
+	@echo "  format       - Format code with black"
+	@echo "  clean        - Remove build artifacts and cache files"
+	@echo "  build        - Build distribution packages"
+	@echo "  publish      - Publish to PyPI using flit"
 
-deps:  ## Install dependencies
-	python -m pip install --upgrade pip
-	python -m pip install black coverage flake8 flit isort lark mccabe mypy pylint pytest pytest-cov pytest-asyncio tox tox-gh-actions pre-commit autoflake
-	pre-commit install
+# Install package using uv
+install:
+	uv pip install -e .
 
-lint:  ## Lint and static-check
-	pre-commit run --all-files
+# Install production dependencies (for CI/CD)
+deps:
+	pip install flit
 
-publish:  ## Publish to PyPi
-	python -m flit publish
+# Install development dependencies using uv
+dev-deps:
+	uv pip install -e ".[dev]"
 
-push:  ## Push code with tags
-	git push && git push --tags
+# Full development setup with uv
+dev-install:
+	@echo "Setting up development environment with uv..."
+	uv venv
+	uv pip install -e ".[dev]"
+	@echo "Development environment ready! Activate with: source .venv/bin/activate"
 
-sonar:  ## Run sonar-scanner
-	make coverage
-	sonar-scanner
+# Run tests
+test:
+	uv run pytest
 
-test:  ## Run tests
-	pytest --cov fractal_specifications
+# Run linters
+lint:
+	uv run ruff check .
+	uv run mypy fractal_specifications
 
-tox:   ## Run tox
-	python -m tox
+# Format code
+format:
+	uv run black .
+	uv run isort .
+	uv run ruff check --fix .
 
-help: ## Show help message
-	@IFS=$$'\n' ; \
-	help_lines=(`fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##/:/'`); \
-	printf "%s\n\n" "Usage: make [task]"; \
-	printf "%-20s %s\n" "task" "help" ; \
-	printf "%-20s %s\n" "------" "----" ; \
-	for help_line in $${help_lines[@]}; do \
-		IFS=$$':' ; \
-		help_split=($$help_line) ; \
-		help_command=`echo $${help_split[0]} | sed -e 's/^ *//' -e 's/ *$$//'` ; \
-		help_info=`echo $${help_split[2]} | sed -e 's/^ *//' -e 's/ *$$//'` ; \
-		printf '\033[36m'; \
-		printf "%-20s %s" $$help_command ; \
-		printf '\033[0m'; \
-		printf "%s\n" $$help_info; \
-	done
+# Clean build artifacts
+clean:
+	rm -rf build/
+	rm -rf dist/
+	rm -rf *.egg-info
+	rm -rf .pytest_cache
+	rm -rf .mypy_cache
+	rm -rf .ruff_cache
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
+	find . -type f -name "*.pyo" -delete
+
+# Build distribution packages
+build: clean
+	flit build
+
+# Publish to PyPI (requires FLIT_USERNAME and FLIT_PASSWORD env vars)
+publish: build
+	flit publish

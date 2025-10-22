@@ -49,7 +49,7 @@ def test_and_specification():
         [EqualsSpecification("id", 1), EqualsSpecification("name", "a")]
     )
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=1, name="a")))
+    assert spec.is_satisfied_by(DC(id=1, name="a"))
 
 
 def test_specification_and_and():
@@ -61,7 +61,7 @@ def test_specification_and_and():
     assert isinstance(spec, AndSpecification)
     assert len(spec.specifications) == 3
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=1, name="a")))
+    assert spec.is_satisfied_by(DC(id=1, name="a"))
 
 
 def test_and_specification_and():
@@ -69,7 +69,7 @@ def test_and_specification_and():
         EqualsSpecification("name", "a")
     )
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=1, name="a")))
+    assert spec.is_satisfied_by(DC(id=1, name="a"))
 
 
 def test_and_specification_and_and():
@@ -77,7 +77,7 @@ def test_and_specification_and_and():
         AndSpecification([EqualsSpecification("name", "a")])
     )
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=1, name="a")))
+    assert spec.is_satisfied_by(DC(id=1, name="a"))
 
 
 def test_or_specification():
@@ -85,7 +85,7 @@ def test_or_specification():
         [EqualsSpecification("id", 1), EqualsSpecification("name", "a")]
     )
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=1, name="b")))
+    assert spec.is_satisfied_by(DC(id=1, name="b"))
 
 
 def test_specification_or_or():
@@ -97,7 +97,7 @@ def test_specification_or_or():
     assert isinstance(spec, OrSpecification)
     assert len(spec.specifications) == 3
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=2, name="a")))
+    assert spec.is_satisfied_by(DC(id=2, name="a"))
 
 
 def test_or_specification_or():
@@ -105,7 +105,7 @@ def test_or_specification_or():
         EqualsSpecification("name", "a")
     )
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=2, name="a")))
+    assert spec.is_satisfied_by(DC(id=2, name="a"))
 
 
 def test_or_specification_or_or():
@@ -113,4 +113,4 @@ def test_or_specification_or_or():
         OrSpecification([EqualsSpecification("name", "a")])
     )
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=2, name="a")))
+    assert spec.is_satisfied_by(DC(id=2, name="a"))

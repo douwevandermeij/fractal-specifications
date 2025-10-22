@@ -143,9 +143,18 @@ def test_random_dsl_strings():
         'field matches "\\"',
         'field matches "\\"',
         "field matches '\\'",
-        "field matches '\..*'",
-        "((id == 1 && price > 25 && price >= 25 && price < 25 && price <= 25 && !(name is None) && field contains 'y' && field in [1, 2, 3] && field matches 'aaa\..*bbb'))",
-        "((id == 1 && price > 25 && price >= 25 && price < 25 && price <= 25 && !(name is None) && field contains 'y') || (id != 1 && field in [1, 2, 3] && field matches '.*abc.*') || (# && #))",
+        r"field matches '\..*'",
+        (
+            r"((id == 1 && price > 25 && price >= 25 && price < 25 && "
+            r"price <= 25 && !(name is None) && field contains 'y' && "
+            r"field in [1, 2, 3] && field matches 'aaa\..*bbb'))"
+        ),
+        (
+            "((id == 1 && price > 25 && price >= 25 && price < 25 && "
+            "price <= 25 && !(name is None) && field contains 'y') || "
+            "(id != 1 && field in [1, 2, 3] && field matches '.*abc.*') || "
+            "(# && #))"
+        ),
         "!(id == 2)",
         "id != 2",
         "id == True",
@@ -159,7 +168,7 @@ def test_random_dsl_strings():
         'roles contains "admin" || roles contains "editor"',
         "!(active == True)",
         "name in['John', 'Jane']",
-        'email matches "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"',
+        r'email matches "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"',
         'address contains "123 Main St"',
         "#",
         "salary is None",

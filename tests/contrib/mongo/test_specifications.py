@@ -9,7 +9,7 @@ from fractal_specifications.contrib.mongo.specifications import (
 
 
 def test_build_none():
-    assert MongoSpecificationBuilder.build(None) == None
+    assert MongoSpecificationBuilder.build(None) is None
 
 
 def test_build_equals_specification(equals_specification):
@@ -87,14 +87,14 @@ def test_build_dict_specification(dict_specification):
 
 
 def test_build_empty_specification(empty_specification):
-    assert MongoSpecificationBuilder.build(empty_specification) == None
+    assert MongoSpecificationBuilder.build(empty_specification) is None
     assert (
         MongoSpecificationBuilder.build(empty_specification & empty_specification)
-        == None
+        is None
     )
     assert (
         MongoSpecificationBuilder.build(empty_specification | empty_specification)
-        == None
+        is None
     )
 
 

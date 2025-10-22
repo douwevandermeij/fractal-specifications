@@ -21,7 +21,7 @@ dfi = df.set_index(["id", "name", "field"])
 
 
 def test_build_none():
-    assert PandasSpecificationBuilder.build(None) == None
+    assert PandasSpecificationBuilder.build(None) is None
 
 
 def test_build_equals_specification(equals_specification):
@@ -111,7 +111,7 @@ def test_build_dict_specification(dict_specification):
 
 
 def test_build_empty_specification(empty_specification):
-    assert PandasSpecificationBuilder.build(empty_specification) == None
+    assert PandasSpecificationBuilder.build(empty_specification) is None
 
 
 def test_specification_not_mapped():
@@ -132,7 +132,7 @@ def test_specification_not_mapped():
 
 
 def test_build_with_index_none():
-    assert PandasIndexSpecificationBuilder.build(None) == None
+    assert PandasIndexSpecificationBuilder.build(None) is None
 
 
 def test_build_with_index_equals_specification(equals_specification):
@@ -239,7 +239,7 @@ def test_build_with_index_dict_specification(dict_specification):
 
 
 def test_build_with_index_empty_specification(empty_specification):
-    assert PandasIndexSpecificationBuilder.build(empty_specification) == None
+    assert PandasIndexSpecificationBuilder.build(empty_specification) is None
 
 
 def test_specification_not_mapped_with_index():

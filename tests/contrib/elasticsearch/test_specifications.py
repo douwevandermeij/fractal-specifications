@@ -9,7 +9,7 @@ from fractal_specifications.contrib.elasticsearch.specifications import (
 
 
 def test_build_none():
-    assert ElasticSpecificationBuilder.build(None) == None
+    assert ElasticSpecificationBuilder.build(None) is None
 
 
 def test_build_equals_specification(equals_specification):
@@ -97,7 +97,7 @@ def test_build_dict_specification(dict_specification):
 
 
 def test_build_empty_specification(empty_specification):
-    assert ElasticSpecificationBuilder.build(empty_specification) == None
+    assert ElasticSpecificationBuilder.build(empty_specification) is None
 
 
 def test_specification_not_mapped():

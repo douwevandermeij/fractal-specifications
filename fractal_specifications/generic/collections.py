@@ -16,7 +16,8 @@ class CollectionSpecification(Specification):
         return self.specifications
 
     def __str__(self):
-        return f"{self.__class__.__name__}({','.join(map(lambda s: str(s), self.specifications))})"
+        specs = ",".join((str(s) for s in self.specifications))
+        return f"{self.__class__.__name__}({specs})"
 
     def __eq__(self, other):
         return type(self) is type(other) and self.specifications == other.specifications
@@ -37,7 +38,7 @@ class CollectionSpecification(Specification):
 
 class AndSpecification(CollectionSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return all([spec.is_satisfied_by(obj) for spec in self.specifications])
+        return all(spec.is_satisfied_by(obj) for spec in self.specifications)
 
     def And(self, specification: Specification) -> Specification:
         if isinstance(specification, AndSpecification):
@@ -48,7 +49,7 @@ class AndSpecification(CollectionSpecification):
 
 class OrSpecification(CollectionSpecification):
     def is_satisfied_by(self, obj: Any) -> bool:
-        return any([spec.is_satisfied_by(obj) for spec in self.specifications])
+        return any(spec.is_satisfied_by(obj) for spec in self.specifications)
 
     def Or(self, specification: Specification) -> Specification:
         if isinstance(specification, OrSpecification):

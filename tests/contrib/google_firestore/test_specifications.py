@@ -9,7 +9,7 @@ from fractal_specifications.contrib.google_firestore.specifications import (
 
 
 def test_build_none():
-    assert FirestoreSpecificationBuilder.build(None) == None
+    assert FirestoreSpecificationBuilder.build(None) is None
 
 
 def test_build_equals_specification(equals_specification):
@@ -45,7 +45,7 @@ def test_build_in_specification(in_specification):
 
 
 def test_build_in_empty_specification(in_empty_specification):
-    assert FirestoreSpecificationBuilder.build(in_empty_specification) == None
+    assert FirestoreSpecificationBuilder.build(in_empty_specification) is None
 
 
 def test_build_less_than_specification(less_than_specification):
@@ -101,7 +101,7 @@ def test_build_dict_specification(dict_specification):
 
 
 def test_build_empty_specification(empty_specification):
-    assert FirestoreSpecificationBuilder.build(empty_specification) == None
+    assert FirestoreSpecificationBuilder.build(empty_specification) is None
 
 
 def test_specification_not_mapped():

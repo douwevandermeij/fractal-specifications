@@ -55,13 +55,13 @@ def test_parse():
 def test_specification_and():
     spec = EqualsSpecification("id", 1).And(EqualsSpecification("name", "a"))
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=1, name="a")))
+    assert spec.is_satisfied_by(DC(id=1, name="a"))
 
 
 def test_specification_or():
     spec = EqualsSpecification("id", 1).Or(EqualsSpecification("name", "a"))
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=1, name="a")))
+    assert spec.is_satisfied_by(DC(id=1, name="a"))
 
 
 def test_specification_not_and():
@@ -69,7 +69,7 @@ def test_specification_not_and():
         EqualsSpecification("id", 1).And(EqualsSpecification("name", "a"))
     )
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=1, name="b")))
+    assert spec.is_satisfied_by(DC(id=1, name="b"))
 
 
 def test_specification_not_or():
@@ -77,7 +77,7 @@ def test_specification_not_or():
         EqualsSpecification("id", 1).Or(EqualsSpecification("name", "a"))
     )
     DC = make_dataclass("DC", [("id", int), ("name", str)])
-    assert spec.is_satisfied_by(DC(**dict(id=2, name="b")))
+    assert spec.is_satisfied_by(DC(id=2, name="b"))
 
 
 def test_parse_none():

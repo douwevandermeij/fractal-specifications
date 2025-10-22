@@ -20,7 +20,7 @@
 
 ## Installation
 
-```sh
+```bash
 pip install fractal-specifications
 ```
 
@@ -35,16 +35,16 @@ which sets out what the specification pattern is, what the benefits are and how 
 
 Setup the development environment by running:
 
-```sh
-make deps
-pre-commit install
+```bash
+make dev-install
+make dev-deps
 ```
 
 Happy coding.
 
 Occasionally you can run:
 
-```sh
+```bash
 make lint
 ```
 

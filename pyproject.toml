@@ -1,22 +1,17 @@
-[tool.poetry]
-name = "fractal-specifications"
-version = "3.3.1"
-description = "Fractal Specifications is an implementation of the specification pattern for building SOLID logic for your Python applications."
-authors = ["Douwe van der Meij <douwe@karibu-online.nl>"]
-
-[tool.poetry.dependencies]
-lark = "*"
-
 [build-system]
-requires = ["flit_core >=2,<4"]
+requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
-[tool.flit.metadata]
-module = "fractal_specifications"
-dist-name = "fractal-specifications"
-author = "Douwe van der Meij"
-author-email = "douwe@karibu-online.nl"
-home-page = "https://github.com/douwevandermeij/fractal-specifications"
+[project]
+name = "fractal-specifications"
+version = "3.4.0"
+description = "Fractal Specifications is an implementation of the specification pattern for building SOLID logic for your Python applications."
+readme = "README.md"
+authors = [
+    { name = "Douwe van der Meij", email = "douwe@karibu-online.nl" }
+]
+license = { text = "MIT" }
+requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
@@ -24,49 +19,104 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Database",
 ]
-description-file = "README.md"
-requires = [
+keywords = ["specification", "pattern", "solid", "database", "query", "sql", "mongodb"]
+
+dependencies = [
     "lark",
 ]
-requires-python=">=3.8"
 
-[tool.flit.metadata.requires-extra]
-test = [
-    "black",
-    "flake8",
-    "isort",
+[project.optional-dependencies]
+django = ["django>=4.2.25"]
+pandas = ["pandas>=2.0.3"]
+duckdb = ["duckdb>=0.9.0"]
+dev = [
+    "django>=4.2.25",
+    "pandas>=2.0.3",
+    "duckdb>=0.9.0",
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "isort>=5.13.2",
 ]
 
+[project.urls]
+Homepage = "https://github.com/douwevandermeij/fractal-specifications"
+Documentation = "https://github.com/douwevandermeij/fractal-specifications#readme"
+Repository = "https://github.com/douwevandermeij/fractal-specifications"
+Issues = "https://github.com/douwevandermeij/fractal-specifications/issues"
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--cov=fractal_specifications --cov-report=term-missing"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "raise AssertionError",
+    "if __name__ == .__main__.:",
+    "@abstractmethod",
+    "def __repr__",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310", "py311", "py312", "py313"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.pytest_cache
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["C", "E", "F", "W", "B", "I"]
+ignore = [
+    "E501",  # Line too long (let Black handle it)
+    "C901",  # Ignore complexity warnings
+    "F403",  # Allow star imports in __init__.py files
+    "F405",  # Allow undefined exports from star imports
+]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+no_implicit_optional = false
+strict_optional = false
+check_untyped_defs = false
+
 [tool.isort]
+profile = "black"
+line_length = 88
 multi_line_output = 3
 include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
-line_length = 88
-
-[tool.black]
-line-length = 88
-target-version = ['py38']
-include = '\.pyi?$'
-exclude = '''
-
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-  )/
-  | foo.py           # also separately exclude a file named foo.py in
-                     # the root of the project
-)
-'''

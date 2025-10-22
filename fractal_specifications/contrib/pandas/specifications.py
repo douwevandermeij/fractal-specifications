@@ -78,30 +78,25 @@ class PandasIndexSpecificationBuilder(PandasSpecificationBuilder):
             collections.OrSpecification: lambda s: reduce(
                 lambda x, y: lambda df: x(df) | y(df), cls._build_collection(s)
             ),
-            operators.EqualsSpecification: lambda s: lambda df: df.index.get_level_values(
-                s.field
-            )
-            == s.value,
-            operators.InSpecification: lambda s: lambda df: df.index.get_level_values(
-                s.field
-            ).isin(s.value),
-            operators.LessThanSpecification: lambda s: lambda df: df.index.get_level_values(
-                s.field
-            )
-            < s.value,
-            operators.LessThanEqualSpecification: lambda s: lambda df: df.index.get_level_values(
-                s.field
-            )
-            <= s.value,
-            operators.GreaterThanSpecification: lambda s: lambda df: df.index.get_level_values(
-                s.field
-            )
-            > s.value,
-            operators.GreaterThanEqualSpecification: lambda s: lambda df: df.index.get_level_values(
-                s.field
-            )
-            >= s.value,
-            operators.IsNoneSpecification: lambda s: lambda df: df.index.get_level_values(
-                s.field
-            ).isna(),
+            operators.EqualsSpecification: lambda s: (
+                lambda df: df.index.get_level_values(s.field) == s.value
+            ),
+            operators.InSpecification: lambda s: (
+                lambda df: df.index.get_level_values(s.field).isin(s.value)
+            ),
+            operators.LessThanSpecification: lambda s: (
+                lambda df: df.index.get_level_values(s.field) < s.value
+            ),
+            operators.LessThanEqualSpecification: lambda s: (
+                lambda df: df.index.get_level_values(s.field) <= s.value
+            ),
+            operators.GreaterThanSpecification: lambda s: (
+                lambda df: df.index.get_level_values(s.field) > s.value
+            ),
+            operators.GreaterThanEqualSpecification: lambda s: (
+                lambda df: df.index.get_level_values(s.field) >= s.value
+            ),
+            operators.IsNoneSpecification: lambda s: (
+                lambda df: df.index.get_level_values(s.field).isna()
+            ),
         }
