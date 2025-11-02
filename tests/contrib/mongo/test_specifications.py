@@ -29,8 +29,25 @@ def test_build_and_specification(and_specification):
 
 
 def test_build_contains_specification(contains_specification):
-    with pytest.raises(SpecificationNotMappedToMongo):
-        MongoSpecificationBuilder.build(contains_specification)
+    assert MongoSpecificationBuilder.build(contains_specification) == {
+        "field": {"$regex": ".*test.*"}
+    }
+
+
+def test_build_contains_specification_with_special_chars():
+    from fractal_specifications.generic.operators import ContainsSpecification
+
+    # Test that special regex characters are properly escaped
+    spec = ContainsSpecification("field", "test.*value+")
+    assert MongoSpecificationBuilder.build(spec) == {
+        "field": {"$regex": r".*test\.\*value\+.*"}
+    }
+
+
+def test_build_not_equals_specification(not_equals_specification):
+    assert MongoSpecificationBuilder.build(not_equals_specification) == {
+        "id": {"$ne": 1}
+    }
 
 
 def test_build_in_specification(in_specification):
@@ -70,14 +87,16 @@ def test_build_greater_than_equal_specification(greater_than_equal_specification
 
 
 def test_build_regex_string_match_specification(regex_string_match_specification):
+    # RegexStringMatchSpecification now uses raw regex pattern without modification
     assert MongoSpecificationBuilder.build(regex_string_match_specification) == {
-        "id": {"$regex": ".*abc.*"}
+        "id": {"$regex": "abc"}
     }
 
 
 def test_build_is_none_specification(is_none_specification):
-    with pytest.raises(SpecificationNotMappedToMongo):
-        MongoSpecificationBuilder.build(is_none_specification)
+    assert MongoSpecificationBuilder.build(is_none_specification) == {
+        "field": {"$eq": None}
+    }
 
 
 def test_build_dict_specification(dict_specification):

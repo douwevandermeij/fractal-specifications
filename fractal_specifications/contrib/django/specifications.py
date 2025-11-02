@@ -1,4 +1,3 @@
-import re
 from functools import reduce
 from typing import Callable, Dict, Iterator, Optional, Type
 
@@ -44,6 +43,7 @@ class DjangoOrmSpecificationBuilder:
                 lambda x, y: x | y, cls._build_collection(s)
             ),
             operators.EqualsSpecification: lambda s: {s.field: s.value},
+            operators.NotEqualsSpecification: lambda s: ~Q(**{s.field: s.value}),
             operators.InSpecification: lambda s: {f"{s.field}__in": s.value},
             operators.LessThanSpecification: lambda s: {f"{s.field}__lt": s.value},
             operators.LessThanEqualSpecification: lambda s: {
@@ -54,7 +54,10 @@ class DjangoOrmSpecificationBuilder:
                 f"{s.field}__gte": s.value
             },
             operators.RegexStringMatchSpecification: lambda s: {
-                f"{s.field}__regex": rf".*{re.escape(s.value)}.*"
+                f"{s.field}__regex": s.value
+            },
+            operators.ContainsSpecification: lambda s: {
+                f"{s.field}__icontains": s.value
             },
             operators.IsNoneSpecification: lambda s: {f"{s.field}__isnull": True},
         }

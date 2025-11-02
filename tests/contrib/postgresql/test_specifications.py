@@ -76,9 +76,9 @@ def test_build_greater_than_equal_specification(greater_than_equal_specification
 
 def test_build_regex_string_match_specification(regex_string_match_specification):
     sql, params = PostgresSpecificationBuilder.build(regex_string_match_specification)
-    # PostgreSQL regex is converted to ILIKE pattern
-    assert sql == "id ILIKE %s"
-    assert params == ["%abc%"]
+    # PostgreSQL uses ~* operator for case-insensitive regex matching
+    assert sql == "id ~* %s"
+    assert params == ["abc"]
 
 
 def test_build_is_none_specification(is_none_specification):

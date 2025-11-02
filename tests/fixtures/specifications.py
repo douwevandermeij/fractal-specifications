@@ -45,6 +45,13 @@ def contains_specification():
 
 
 @pytest.fixture
+def not_equals_specification():
+    from fractal_specifications.generic.operators import NotEqualsSpecification
+
+    return NotEqualsSpecification("id", 1)
+
+
+@pytest.fixture
 def in_specification():
     from fractal_specifications.generic.operators import InSpecification
 

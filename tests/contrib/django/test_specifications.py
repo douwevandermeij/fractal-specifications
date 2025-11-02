@@ -29,9 +29,14 @@ def test_build_and_specification(and_specification):
     )
 
 
+def test_build_not_equals_specification(not_equals_specification):
+    assert DjangoOrmSpecificationBuilder.build(not_equals_specification) == ~Q(id=1)
+
+
 def test_build_contains_specification(contains_specification):
-    with pytest.raises(SpecificationNotMappedToDjangoOrm):
-        DjangoOrmSpecificationBuilder.build(contains_specification)
+    assert DjangoOrmSpecificationBuilder.build(contains_specification) == Q(
+        field__icontains="test"
+    )
 
 
 def test_build_in_specification(in_specification):
@@ -70,7 +75,7 @@ def test_build_greater_than_equal_specification(greater_than_equal_specification
 
 def test_build_regex_string_match_specification(regex_string_match_specification):
     assert DjangoOrmSpecificationBuilder.build(regex_string_match_specification) == Q(
-        id__regex=".*abc.*"
+        id__regex="abc"
     )
 
 

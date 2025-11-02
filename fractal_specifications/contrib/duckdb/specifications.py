@@ -87,10 +87,10 @@ class DuckDBSpecificationBuilder:
             return f"{specification.field} >= ?", [specification.value]
 
         elif isinstance(specification, RegexStringMatchSpecification):
-            # DuckDB ILIKE for case-insensitive pattern matching (for consistency)
+            # DuckDB regex operator for pattern matching
             # NOTE: Check Regex BEFORE Contains since Regex inherits from Contains
-            pattern = f"%{specification.value}%"
-            return f"{specification.field} ILIKE ?", [pattern]
+            # Using regexp_matches for regex matching
+            return f"regexp_matches({specification.field}, ?)", [specification.value]
 
         elif isinstance(specification, ContainsSpecification):
             # DuckDB ILIKE for case-insensitive pattern matching

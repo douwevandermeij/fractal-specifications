@@ -220,7 +220,27 @@ spec.is_satisfied_by(Demo("fractal_specifications"))  # True
 ## Contrib
 
 This library also comes with some additional helpers to integrate the specifications easier with existing backends,
-such as the Django ORM.
+such as the Django ORM, PostgreSQL, MongoDB, and more.
+
+### Specification Support Matrix
+
+| Specification Type | Django | SQLAlchemy | PostgreSQL | DuckDB | MongoDB | Elasticsearch | Firestore | Pandas |
+|-------------------|--------|------------|------------|--------|---------|---------------|-----------|--------|
+| `EqualsSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `NotEqualsSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| `InSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `ContainsSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅* | ❌ |
+| `RegexStringMatchSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| `LessThanSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `LessThanEqualSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `GreaterThanSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `GreaterThanEqualSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `IsNoneSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| `AndSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `OrSpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `EmptySpecification` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+\* Firestore's `ContainsSpecification` uses `array-contains` operator (for array membership, not string substring matching)
 
 ### Django
 
@@ -239,16 +259,16 @@ Query support:
     * `Specification.parse(field__sub_field="abc", _lookup_separator="__")`
       * Will result in: `EqualsSpecification("field__sub_field", "abc")` instead of `EqualsSpecification("field.sub_field", "abc")`
 * [x] Equals `field=value` or `__exact`
+* [x] Not equals `~Q(field=value)` (negated Q object)
 * [x] Less than `__lt`
 * [x] Less than equal `__lte`
 * [x] Greater than `__gt`
 * [x] Greater than equal `__gte`
 * [x] In `__in`
+* [x] Contains `__icontains` (case-insensitive substring match)
+* [x] Regex `__regex` (user-provided regex pattern)
 * [x] And `Q((field_a=value_a) & (field_b=value_b))`
 * [x] Or `Q((field_a=value_a) | (field_b=value_b))`
-* [x] Partial regex `__regex=r".* value .*"`
-* [ ] Full regex `__regex`
-* [ ] Contains regex `__contains`
 * [x] Is null `__isnull`
 
 ```python
@@ -302,15 +322,46 @@ Road.objects.filter(q)
 
 ### SQLAlchemy
 
+Specifications can be converted to SQLAlchemy compatible formats with `SqlAlchemyOrmSpecificationBuilder`.
+
 Query support:
-* [x] Direct model fields `{field: value}`
-* [x] And `{field: value, field2: value2}`
+* [x] Equals `{field: value}` (for `filter_by()` usage)
+* [x] Not equals `(field, "ne", value)` (tuple format for `filter()` usage)
+* [x] In `(field, "in", [values])` (tuple format for `filter()` usage)
+* [x] Contains `(field, "contains", value)` (tuple format for `filter()` usage)
+* [x] Regex `(field, "regex", pattern)` (tuple format for `filter()` usage)
+* [x] Less than `(field, "lt", value)` (tuple format for `filter()` usage)
+* [x] Less than equal `(field, "le", value)` (tuple format for `filter()` usage)
+* [x] Greater than `(field, "gt", value)` (tuple format for `filter()` usage)
+* [x] Greater than equal `(field, "ge", value)` (tuple format for `filter()` usage)
+* [x] Is null `(field, "is_none", None)` (tuple format for `filter()` usage)
+* [x] And - returns dict if all specs return dicts, otherwise list
 * [x] Or `[{field: value}, {field2: value2}]`
+
+**Note**: Operations that return tuples require using SQLAlchemy's `filter()` method with appropriate column methods:
+- `NotEqualsSpecification`: Use `Model.field != value`
+- `LessThanSpecification`: Use `Model.field < value`
+- `LessThanEqualSpecification`: Use `Model.field <= value`
+- `GreaterThanSpecification`: Use `Model.field > value`
+- `GreaterThanEqualSpecification`: Use `Model.field >= value`
+- `IsNoneSpecification`: Use `Model.field.is_(None)`
+- `ContainsSpecification`: Use `Model.field.contains(value)` or `Model.field.like(f'%{value}%')`
+- `RegexStringMatchSpecification`: Use `Model.field.op('~*')(pattern)` for PostgreSQL
+- `InSpecification`: Use `Model.field.in_(values)`
 
 ```python
 from fractal_specifications.contrib.sqlalchemy.specifications import SqlAlchemyOrmSpecificationBuilder
+from fractal_specifications.generic.operators import EqualsSpecification, ContainsSpecification
 
-q = SqlAlchemyOrmSpecificationBuilder.build(specification)
+# Simple equals - returns dict, use with filter_by()
+spec = EqualsSpecification("name", "John")
+q = SqlAlchemyOrmSpecificationBuilder.build(spec)  # {"name": "John"}
+Model.query.filter_by(**q)
+
+# Contains - returns tuple, use with filter()
+spec = ContainsSpecification("description", "test")
+field, op, value = SqlAlchemyOrmSpecificationBuilder.build(spec)  # ("description", "contains", "test")
+Model.query.filter(getattr(Model, field).contains(value))
 ```
 
 ### Elasticsearch
@@ -353,23 +404,91 @@ from fractal_specifications.contrib.google_firestore.specifications import Fires
 q = FirestoreSpecificationBuilder.build(specification)
 ```
 
-### Mongo
+### PostgreSQL
+
+Specifications can be converted to PostgreSQL WHERE clauses with parameters using `PostgresSpecificationBuilder`.
+
+Query support:
+* [x] Equals `field = %s` with `[value]`
+* [x] Not equals `field != %s` with `[value]`
+* [x] In `field IN (%s,%s,...)` with `[value1, value2, ...]`
+* [x] Contains `field ILIKE %s` with `["%value%"]` (case-insensitive substring match)
+* [x] Regex `field ~* %s` with `[pattern]` (case-insensitive regex)
+* [x] Less than `field < %s` with `[value]`
+* [x] Less than equal `field <= %s` with `[value]`
+* [x] Greater than `field > %s` with `[value]`
+* [x] Greater than equal `field >= %s` with `[value]`
+* [x] Is null `field IS NULL` with `[]`
+* [x] And `(clause1) AND (clause2)`
+* [x] Or `(clause1) OR (clause2)`
+
+```python
+from fractal_specifications.contrib.postgresql.specifications import PostgresSpecificationBuilder
+from fractal_specifications.generic.operators import EqualsSpecification, ContainsSpecification
+
+spec = EqualsSpecification("name", "John") & ContainsSpecification("description", "test")
+sql, params = PostgresSpecificationBuilder.build(spec)
+# sql: "(name = %s) AND (description ILIKE %s)"
+# params: ["John", "%test%"]
+
+cursor.execute(f"SELECT * FROM table WHERE {sql}", params)
+```
+
+### DuckDB
+
+Specifications can be converted to DuckDB WHERE clauses with parameters using `DuckDBSpecificationBuilder`.
+
+Query support:
+* [x] Equals `field = ?` with `[value]`
+* [x] Not equals `field != ?` with `[value]`
+* [x] In `field IN (?,?,...)` with `[value1, value2, ...]`
+* [x] Contains `field ILIKE ?` with `["%value%"]` (case-insensitive substring match)
+* [x] Regex `regexp_matches(field, ?)` with `[pattern]`
+* [x] Less than `field < ?` with `[value]`
+* [x] Less than equal `field <= ?` with `[value]`
+* [x] Greater than `field > ?` with `[value]`
+* [x] Greater than equal `field >= ?` with `[value]`
+* [x] Is null `field IS NULL` with `[]`
+* [x] And `(clause1) AND (clause2)`
+* [x] Or `(clause1) OR (clause2)`
+
+```python
+from fractal_specifications.contrib.duckdb.specifications import DuckDBSpecificationBuilder
+from fractal_specifications.generic.operators import EqualsSpecification, RegexStringMatchSpecification
+
+spec = EqualsSpecification("status", "active") & RegexStringMatchSpecification("email", r".*@example\.com")
+sql, params = DuckDBSpecificationBuilder.build(spec)
+# sql: "(status = ?) AND (regexp_matches(email, ?))"
+# params: ["active", ".*@example\\.com"]
+
+conn.execute(f"SELECT * FROM table WHERE {sql}", params)
+```
+
+### MongoDB
 
 Query support:
 * [x] Equals `{field: {"$eq": value}}`
-* [x] And `{"$and": [{field: {"$eq": value}}, {field2: {"$eq": value2}}]}`
-* [x] Or `{"or": [{field: {"$eq": value}}, {field2: {"$eq": value2}}]}`
-* [x] In `{field: {"$in": value}}`
+* [x] Not equals `{field: {"$ne": value}}`
+* [x] In `{field: {"$in": [values]}}`
+* [x] Contains `{field: {"$regex": ".*escaped_value.*"}}` (literal substring, special chars escaped)
+* [x] Regex `{field: {"$regex": pattern}}` (user-provided regex pattern)
 * [x] Less than `{field: {"$lt": value}}`
 * [x] Less than equal `{field: {"$lte": value}}`
 * [x] Greater than `{field: {"$gt": value}}`
 * [x] Greater than equal `{field: {"$gte": value}}`
-* [x] Regex string match `{field: {"$regex": ".*%s.*" % value}}`
+* [x] Is null `{field: {"$eq": None}}`
+* [x] And `{"$and": [{...}, {...}]}`
+* [x] Or `{"$or": [{...}, {...}]}`
 
 ```python
 from fractal_specifications.contrib.mongo.specifications import MongoSpecificationBuilder
+from fractal_specifications.generic.operators import EqualsSpecification, ContainsSpecification
 
-q = MongoSpecificationBuilder.build(specification)
+spec = EqualsSpecification("status", "active") & ContainsSpecification("name", "test")
+q = MongoSpecificationBuilder.build(spec)
+# q: {"$and": [{"status": {"$eq": "active"}}, {"name": {"$regex": ".*test.*"}}]}
+
+collection.find(q)
 ```
 
 ### Pandas

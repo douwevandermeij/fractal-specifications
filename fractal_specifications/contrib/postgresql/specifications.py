@@ -87,10 +87,10 @@ class PostgresSpecificationBuilder:
             return f"{specification.field} >= %s", [specification.value]
 
         elif isinstance(specification, RegexStringMatchSpecification):
-            # PostgreSQL ILIKE for case-insensitive pattern matching
+            # PostgreSQL regex operator for pattern matching
             # NOTE: Check Regex BEFORE Contains since Regex inherits from Contains
-            pattern = f"%{specification.value}%"
-            return f"{specification.field} ILIKE %s", [pattern]
+            # Using ~* for case-insensitive regex matching
+            return f"{specification.field} ~* %s", [specification.value]
 
         elif isinstance(specification, ContainsSpecification):
             # PostgreSQL ILIKE for case-insensitive pattern matching

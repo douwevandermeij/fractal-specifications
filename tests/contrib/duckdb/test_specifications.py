@@ -76,9 +76,9 @@ def test_build_greater_than_equal_specification(greater_than_equal_specification
 
 def test_build_regex_string_match_specification(regex_string_match_specification):
     sql, params = DuckDBSpecificationBuilder.build(regex_string_match_specification)
-    # DuckDB ILIKE for case-insensitive pattern matching (for consistency)
-    assert sql == "id ILIKE ?"
-    assert params == ["%abc%"]
+    # DuckDB uses regexp_matches for regex matching
+    assert sql == "regexp_matches(id, ?)"
+    assert params == ["abc"]
 
 
 def test_build_is_none_specification(is_none_specification):
