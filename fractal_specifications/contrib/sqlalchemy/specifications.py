@@ -1,4 +1,4 @@
-from typing import Collection, Optional
+from typing import Any, Collection, Optional, cast
 
 from fractal_specifications.generic.collections import AndSpecification, OrSpecification
 from fractal_specifications.generic.operators import (
@@ -44,7 +44,7 @@ class SqlAlchemyOrmSpecificationBuilder:
             ]
             # If all results are dicts, merge them (for filter_by usage)
             if all(isinstance(r, dict) for r in results):
-                return {k: v for r in results for k, v in r.items()}
+                return {k: v for r in results for k, v in cast(dict[str, Any], r).items()}
             # Otherwise return as list (requires filter() usage)
             return results if results else None
         elif isinstance(specification, EqualsSpecification):

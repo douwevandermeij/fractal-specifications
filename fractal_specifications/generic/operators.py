@@ -151,7 +151,7 @@ class RegexStringMatchSpecification(ContainsSpecification):
         import re
 
         return bool(
-            re.match(self.value, self.pre_processor(_get_value(obj, self.field)))
+            re.match(self.value, self.pre_processor(_get_value(obj, self.field) or ""))
         )
 
     @classmethod

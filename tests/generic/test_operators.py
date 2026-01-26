@@ -171,3 +171,9 @@ def test_pre_process_regex_string_match_specification():
     )
     DC = make_dataclass("DC", [("roles", List[str])])
     assert spec.is_satisfied_by(DC(roles=["admin", "owner"]))
+
+
+def test_none_regex_string_match_specification():
+    spec = RegexStringMatchSpecification("name", r"^[a-z]+$")
+    DC = make_dataclass("DC", [("name", str)])
+    assert not spec.is_satisfied_by(DC(name=None))
