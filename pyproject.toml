@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "fractal-specifications"
-version = "3.4.2"
+version = "3.5.0"
 description = "Fractal Specifications is an implementation of the specification pattern for building SOLID logic for your Python applications."
 readme = "README.md"
 authors = [
@@ -30,6 +30,9 @@ keywords = ["specification", "pattern", "solid", "database", "query", "sql", "mo
 
 dependencies = [
     "lark",
+    "mypy>=1.18.2",
+    "pytest>=8.4.2",
+    "ruff>=0.14.1",
 ]
 
 [project.optional-dependencies]
